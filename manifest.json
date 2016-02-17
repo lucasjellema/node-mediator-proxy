@@ -1,0 +1,9 @@
+{
+  "runtime":{
+    "majorVersion":"0.12"
+  },
+  "command": "node mediator-proxy.js",
+  "release": {},
+  "notes": "Proxy for HTTP requests - using Express"
+}
+

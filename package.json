@@ -1,0 +1,17 @@
+{
+  "name": "mediator-proxy",
+  "version": "0.0.1",
+  "description": "A connector for HTTP requests between network domains having trouble reaching each other",
+  "main": "mediator-proxy.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "http, proxy"
+  ],
+  "author": "Lucas Jellema",
+  "license": "ISC",
+  "dependencies": {
+      "express": "~4.13.4"
+  }
+}
