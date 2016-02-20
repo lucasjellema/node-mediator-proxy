@@ -108,8 +108,8 @@ var optionsC = {
   method: 'GET'
 };
 /* http://140.86.4.95:80/soa-infra/services/aced-cloud-demo/ProposedActsService/ProposedActsService?wsdl */
-console.log(request.url);
-console.log(request.path);
+console.log("request url="+request.url);
+console.log("request path="+request.path);
   var data="";
   // copy the URL path after /soacs to the destination path
   options.path = request.path.substring(6);
