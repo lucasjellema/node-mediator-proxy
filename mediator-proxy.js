@@ -101,7 +101,7 @@ function handleSOACS(request, response) {
 
 var targetServer = "140.86.4.95";
 
-var optionsC = {
+var optionsSOACS = {
   host: targetServer,
   port: 8080,
   path:'/soa-infra/services/aced-cloud-demo/ProposedActsService/ProposedActsService?wsdl',
@@ -112,13 +112,13 @@ console.log("request url="+request.url);
 console.log("request path="+request.path);
   var data="";
   // copy the URL path after /soacs to the destination path
-  options.path = request.url.substring(6);
+  optionsSOACS.path = request.url.substring(6);
 var url_parts = url.parse(request.url, true);
 var query = url_parts.query;
 console.log("query:"+query);
 
-  console.log('forward path '+options.path);
-  var req = https.request(options, function(res) {
+  console.log('forward path '+optionsSOACS.path);
+  var req = https.request(optionsSOACS, function(res) {
   res.on('data', function(d) {
     console.log("on receive data");
     process.stdout.write(d);
