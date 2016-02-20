@@ -39,11 +39,25 @@ headers: {
   method: 'GET'
 };
 
-
+/*
 app.listen(PORT, function () {
   console.log('Server running, Express is listening on port ...'+PORT);
 });
+*/
 
+if (module === require.main) {
+  // [START server]
+  // Start the server
+  var server = app.listen(process.env.PORT || 8080, function () {
+    var host = server.address().address;
+    var port = server.address().port;
+
+    console.log('App listening at http://%s:%s', host, port);
+  });
+  // [END server]
+}
+
+module.exports = app;
 
 
 /*
@@ -65,11 +79,19 @@ req.on('error', function(e) {
 //curl -vIX GET  https://data-api-lucasjellema.apaas.em2.oraclecloud.com/departments/90
 app.get('/', function (req, res) {
 
+console.log('request received: '+request.url);
 
     res.writeHead(200, {'Content-Type': 'text/html'});
     res.write("No Data Requested, so none is returned");
     res.end();
 });
+
+// Say hello!
+app.get('/hello', function(req, res) {
+  res.status(200).send('Hello, world!');
+});
+// [END hello_world]
+
 
 app.get('/hrm/*', function(req,res){ handleHRM(req, res);} );
 app.get('/conversion/*', function(req,res){ handleConversion(req, res);} );
