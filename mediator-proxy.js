@@ -1,6 +1,7 @@
 
 
 var https = require('https'),
+    http = require('http'),
     //httpProxy = require('http-proxy'),
 	url = require('url');
 
@@ -117,8 +118,9 @@ var url_parts = url.parse(request.url, true);
 var query = url_parts.query;
 console.log("query:"+query);
 
+  console.log('forward host and port  '+optionsSOACS.targetServer+":"+optionsSOACS.port);
   console.log('forward path '+optionsSOACS.path);
-  var req = https.request(optionsSOACS, function(res) {
+  var req = http.request(optionsSOACS	, function(res) {
   res.on('data', function(d) {
     console.log("on receive data");
     process.stdout.write(d);
