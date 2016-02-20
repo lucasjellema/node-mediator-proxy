@@ -112,7 +112,7 @@ console.log(request.url);
 console.log(request.path);
   var data="";
   // copy the URL path after /soacs to the destination path
-  options.path = request.path.substring(5);
+  options.path = request.path.substring(6);
   console.log('forward path '+options.path);
   var req = https.request(options, function(res) {
   res.on('data', function(d) {
