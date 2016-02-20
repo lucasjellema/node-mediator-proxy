@@ -95,7 +95,56 @@ app.get('/hello', function(req, res) {
 
 app.get('/hrm/*', function(req,res){ handleHRM(req, res);} );
 app.get('/conversion/*', function(req,res){ handleConversion(req, res);} );
+app.get('/soacs/*', function(req,res){ handleSOACS(req, res);} );
+
+function handleSOACS(request, response) {
+
+var targetServer = "140.86.4.95";
+
+var optionsC = {
+  host: targetServer,
+  port: 8080,
+  path:'/soa-infra/services/aced-cloud-demo/ProposedActsService/ProposedActsService?wsdl',
+  method: 'GET'
+};
+/* http://140.86.4.95:80/soa-infra/services/aced-cloud-demo/ProposedActsService/ProposedActsService?wsdl */
+console.log(request.url);
+console.log(request.path);
+  var data="";
+  // copy the URL path after /soacs to the destination path
+  options.path = request.path.substring(5);
+  console.log('forward path '+options.path);
+  var req = https.request(options, function(res) {
+  res.on('data', function(d) {
+    console.log("on receive data");
+    process.stdout.write(d);
+	data=data+d;
+    console.log("data = "+data);
+  });//data
+
+  res.on('end', function() {
+    console.log("end receive data");
+    console.log('data = '+ data);
+    response.setHeader('Access-Control-Allow-Origin', '*');
+    response.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+    response.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
+    response.setHeader('Access-Control-Allow-Credentials', true);
+    console.log("set headers done");
+    response.writeHead(200, {'Content-Type': 'text/xml'});
 	
+	console.log("write head");
+    response.end(data);
+	console.log("done response: "+data);
+  });//end
+  
+}//req
+);
+console.log('req end');
+req.end();
+} //handleSOACS
+
+	
+
 function handleHRM(request, response) {
 console.log(request.url);
 console.log(request.path);
