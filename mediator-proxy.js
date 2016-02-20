@@ -48,7 +48,7 @@ app.listen(PORT, function () {
 if (module === require.main) {
   // [START server]
   // Start the server
-  var server = app.listen(process.env.PORT || 8080, function () {
+  var server = app.listen(80, function () {
     var host = server.address().address;
     var port = server.address().port;
 
@@ -103,7 +103,7 @@ var targetServer = "140.86.4.95";
 
 var optionsC = {
   host: targetServer,
-  port: 80,
+  port: 8080,
   path:'/soa-infra/services/aced-cloud-demo/ProposedActsService/ProposedActsService?wsdl',
   method: 'GET'
 };
