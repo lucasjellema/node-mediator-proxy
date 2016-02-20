@@ -103,7 +103,7 @@ var targetServer = "140.86.4.95";
 
 var optionsC = {
   host: targetServer,
-  port: 8080,
+  port: 80,
   path:'/soa-infra/services/aced-cloud-demo/ProposedActsService/ProposedActsService?wsdl',
   method: 'GET'
 };
@@ -112,7 +112,7 @@ console.log("request url="+request.url);
 console.log("request path="+request.path);
   var data="";
   // copy the URL path after /soacs to the destination path
-  options.path = request.path.substring(6);
+  options.path = request.url.substring(6);
 var url_parts = url.parse(request.url, true);
 var query = url_parts.query;
 console.log("query:"+query);
