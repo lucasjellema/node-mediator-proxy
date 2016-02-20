@@ -5,7 +5,7 @@
   "repository": "https://github.com/lucasjellema/node-mediator-proxy",
   "main": "mediator-proxy.js",
   "scripts": {
-    "start": "node mediator-proxy.js",
+    "start": "nodejs mediator-proxy.js",
     "monitor": "nodemon mediator-proxy.js"
   },
   "author": "Lucas Jellema",
