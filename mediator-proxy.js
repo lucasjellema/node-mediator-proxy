@@ -121,6 +121,11 @@ console.log("query:"+query);
   console.log('forward host and port  '+optionsSOACS.targetServer+":"+optionsSOACS.port);
   console.log('forward path '+optionsSOACS.path);
   var req = http.request(optionsSOACS	, function(res) {
+   //response is in
+   
+   console.log("** on response");
+   response.writeHead(res.statusCode, res.headers);
+  
   res.on('data', function(d) {
     console.log("on receive data");
     process.stdout.write(d);
@@ -131,12 +136,6 @@ console.log("query:"+query);
   res.on('end', function() {
     console.log("end receive data");
     console.log('data = '+ data);
-    response.setHeader('Access-Control-Allow-Origin', '*');
-    response.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
-    response.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
-    response.setHeader('Access-Control-Allow-Credentials', true);
-    console.log("set headers done");
-    response.writeHead(200, {'Content-Type': 'text/xml'});
 	
 	console.log("write head");
     response.end(data);
