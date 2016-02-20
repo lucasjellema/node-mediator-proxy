@@ -6,7 +6,7 @@
   "main": "mediator-proxy.js",
   "scripts": {
     "start": "node mediator-proxy.js",
-    "monitor": "nodemon mediator-proxy.js",
+    "monitor": "nodemon mediator-proxy.js"
   },
   "author": "Lucas Jellema",
   "license": "Apache Version 2.0",
