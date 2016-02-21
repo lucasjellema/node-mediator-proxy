@@ -122,6 +122,10 @@ function handleSOACS(request, response) {
 
 var targetServer = "140.86.4.95";
 
+/* 
+NOTE: any reference in the response to 140.86.4.95:8080/soa-infra should be removed and replaced with a reference to 104.155.85.98/soacs/soa-infra
+*/
+
 var optionsSOACS = {
   host: targetServer,
   port: 8080,
@@ -151,6 +155,8 @@ console.log("query:"+query);
     process.stdout.write(d);
 	data=data+d;
     console.log("data = "+data);
+	// replace references to SOA CS machine with references to proxy service
+	data = data.replace("140.86.4.95:8080/soa-infra","104.155.85.98/soacs/soa-infra");
   });//data
 
   res.on('end', function() {
