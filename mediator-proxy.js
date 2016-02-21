@@ -337,7 +337,6 @@ function handleArtists(req, res) {
                           if (!error && response.statusCode == 200) {
                           var echonestBioSearchResponse = JSON.parse(body);
                           var bio = echonestBioSearchResponse.response.biographies[0].text;
-	bio='message from proxy ; original name was '+query.artist +' headers were set'   +JSON.stringify(artist);
     					  artist.biography = bio;
 							res.setHeader('Content-Type', 'application/json; charset=utf-8');
     res.setHeader('Access-Control-Allow-Origin', '*');
