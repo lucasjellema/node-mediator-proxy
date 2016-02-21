@@ -5,13 +5,14 @@
   "repository": "https://github.com/lucasjellema/node-mediator-proxy",
   "main": "mediator-proxy.js",
   "scripts": {
-    "start": "nodejs hello.js",
+    "start": "sudo nodejs mediator-proxy.js",
     "monitor": "nodemon mediator-proxy.js"
   },
   "author": "Lucas Jellema",
   "license": "Apache Version 2.0",
   "dependencies": {
-    "express": "^4.13.4"
+    "express": "^4.13.4", 
+    "request": ">=2.69.0"
   },
   "engines": {
     "node": ">=0.12.7"

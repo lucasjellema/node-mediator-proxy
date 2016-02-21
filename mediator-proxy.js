@@ -3,11 +3,15 @@
 var https = require('https'),
     http = require('http'),
     //httpProxy = require('http-proxy'),
-	url = require('url');
+	url = require('url'),
+	request = require('request');
 
 /* docs:
 https://nodejs.org/api/https.html
 https://nodejs.org/api/http.html
+
+https://github.com/request/request
+
 */	
 	
 var express = require('express');
@@ -29,7 +33,7 @@ https.get('https://mockdataapi-lucasjellema.apaas.em2.oraclecloud.com/department
   console.error('HTTPS error '+e);
 });
 */
-var PORT =5100;
+var PORT =80;
 
 var options = {
   host: targetServer,
@@ -49,11 +53,10 @@ app.listen(PORT, function () {
 if (module === require.main) {
   // [START server]
   // Start the server
-  var server = app.listen(80, function () {
+  var server = app.listen(PORT, function () {
     var host = server.address().address;
-    var port = server.address().port;
 
-    console.log('App listening at http://%s:%s', host, port);
+    console.log('App listening at http://%s:%s', host, PORT);
   });
   // [END server]
 }
@@ -97,6 +100,23 @@ app.get('/hello', function(req, res) {
 app.get('/hrm/*', function(req,res){ handleHRM(req, res);} );
 app.get('/conversion/*', function(req,res){ handleConversion(req, res);} );
 app.get('/soacs/*', function(req,res){ handleSOACS(req, res);} );
+app.post('/soacs/*', function(req,res){ handleSOACSPost(req, res);} );
+
+/* deal with SOAP calls to SOACS */
+function handleSOACSPost(req, res) {
+/*
+http://stackoverflow.com/questions/10435407/proxy-with-express-js
+*/
+ var targetServer = "140.86.4.95";
+  /* http://140.86.4.95:80/soa-infra/services/aced-cloud-demo/ProposedActsService/ProposedActsService?wsdl */
+ var targetPath = req.url.substring(6);
+ var targetPort=8080;
+ console.log('forward host and port  '+targetServer+":"+targetPort);
+ var targetUrl = "http://"+targetServer+":"+targetPort+targetPath;
+ console.log('forward path '+targetUrl);
+ var route_request = request.post({uri: targetUrl, json: req.body});
+ req.pipe(route_request).pipe(res);
+} //handleSOACSPost
 
 function handleSOACS(request, response) {
 
@@ -147,7 +167,6 @@ console.log("query:"+query);
 console.log('req end');
 req.end();
 } //handleSOACS
-
 	
 
 function handleHRM(request, response) {
