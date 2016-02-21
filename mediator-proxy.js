@@ -337,14 +337,14 @@ function handleArtists(req, res) {
                           if (!error && response.statusCode == 200) {
                           var echonestBioSearchResponse = JSON.parse(body);
                           var bio = echonestBioSearchResponse.response.biographies[0].text;
-						  artist.biography = bio;
-                          res.setHeader('Content-Type', 'application/json; charset=utf-8');
+	bio='message from proxy ; original name was '+query.artist +' headers were set'   +JSON.stringify(artist);
+    					  artist.biography = bio;
+							res.setHeader('Content-Type', 'application/json; charset=utf-8');
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
     res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
     res.setHeader('Access-Control-Allow-Credentials', true);
               res.statusCode =200;
-    
                           res.send(JSON.stringify(artist));
 
 						  }//if
