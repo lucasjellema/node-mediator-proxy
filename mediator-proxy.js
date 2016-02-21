@@ -34,6 +34,7 @@ https.get('https://mockdataapi-lucasjellema.apaas.em2.oraclecloud.com/department
 });
 */
 var PORT =80;
+//var PORT =5100;
 
 var options = {
   host: targetServer,
@@ -337,7 +338,14 @@ function handleArtists(req, res) {
                           var echonestBioSearchResponse = JSON.parse(body);
                           var bio = echonestBioSearchResponse.response.biographies[0].text;
 						  artist.biography = bio;
-                          res.status(200).send(JSON.stringify(artist));
+                          res.setHeader('Content-Type', 'application/json; charset=utf-8');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
+    res.setHeader('Access-Control-Allow-Credentials', true);
+              res.statusCode =200;
+    
+                          res.send(JSON.stringify(artist));
 
 						  }//if
 						  else {
