@@ -4,8 +4,12 @@ var https = require('https'),
     http = require('http'),
     //httpProxy = require('http-proxy'),
 	url = require('url'),
-	request = require('request');
-
+	request = require('request'),
+	 qs = require('querystring'),
+	 bodyParser = require('body-parser')
+	;
+var soap = require('soap');
+var xml2js = require('xml2js');
 /* docs:
 https://nodejs.org/api/https.html
 https://nodejs.org/api/http.html
@@ -33,8 +37,8 @@ https.get('https://mockdataapi-lucasjellema.apaas.em2.oraclecloud.com/department
   console.error('HTTPS error '+e);
 });
 */
-var PORT =80;
-//var PORT =5100;
+//var PORT =80;
+var PORT =5100;
 
 var options = {
   host: targetServer,
@@ -96,13 +100,106 @@ app.get('/hello', function(req, res) {
   res.status(200).send('Hello, world!');
 });
 // [END hello_world]
-
-
 app.get('/hrm/*', function(req,res){ handleHRM(req, res);} );
 app.get('/conversion/*', function(req,res){ handleConversion(req, res);} );
 app.get('/soacs/*', function(req,res){ handleSOACS(req, res);} );
 app.post('/soacs/*', function(req,res){ handleSOACSPost(req, res);} );
+
+app.use(bodyParser.json()); // for parsing application/json
+//app.use(bodyParser.urlencoded({ extended: false })); 
+// parse an HTML body into a string 
+app.use(bodyParser.text({ type: 'text/xml' }))
+app.post('/ics/*', function(req,res){ handleICSPost(req, res);} );
+app.get('/ics/*', function(req,res){ handleICS(req, res);} );
+
 app.get('/artists/*', function(req,res){ handleArtists(req, res);} );
+
+
+/* deal with (REST and SOAP) calls to ICS */
+function handleICSPost(req, res) {
+ if (req.url.indexOf('/rest/')> -1 ) { 
+   handleICS(req, res);
+ } else 
+ {
+ var icsUsername= 'gse_cloud-admin@oracleads.com';
+ var icsPassword = 'bristlyYear5^';
+ var url = 'https://icsdem0058service-icsdem0058.integration.us2.oraclecloud.com:443/integration/flowsvc/soap/PROPOSENEWACTFOR_SOAP/v01/?wsdl';
+
+ // turn SOAP Envelope to JSON object
+ xml2js.parseString(req.body, function (err, result) {
+    //when parsing is one, interpret the object
+	var body = result['soapenv:Envelope']['soapenv:Body'];
+	var request = body[0]['aced:submitActProposalRequestMessage'];
+	
+    var actProposal = { artistName: request[0]['aced:artistName']
+                      , numberOfVotes :  request[0]['aced:numberOfVotes']
+                      , description: request[0]['aced:description']
+                      ,imageURL : request[0]['aced:imageUrl']
+                      };
+	// create a JavaScript proxy-client for the WebService at the specified URL (in ICS)				  
+    soap.createClient(url, function(err, client) {		
+	  // this setting is required for ICS
+	  client.setSecurity(new soap.WSSecurity(icsUsername, icsPassword))
+      client.submitActProposal
+      ( actProposal
+	  , function(err, result, raw, soapHeader) {
+            console.log("result is in for submitActProposal "+result );
+	        console.log(result['proposedActId']);
+	        console.log("error  for submitActProposal "+ err);
+            console.log("submitActProposal raw "+raw);
+            res.end(raw);
+        }// callback on response from SOAP WebService
+      );
+    }
+    );//createClient
+	
+});//xml2js
+}//else
+}// handICSPost
+
+
+/* deal with (REST and SOAP) calls to ICS */
+function handleICS(req, res) {
+ var icsUsername= 'gse_cloud-admin@oracleads.com';
+ var icsPassword = 'bristlyYear5^';
+
+
+/*
+http://stackoverflow.com/questions/10435407/proxy-with-express-js
+*/
+ var targetServer = "icsdem0058service-icsdem0058.integration.us2.oraclecloud.com";
+  /* 
+  https://icsdem0058service-icsdem0058.integration.us2.oraclecloud.com:443/integration/flowsvc/soap/PROPOSENEWACTFOR_SOAP/v01/
+  and
+  https://icsdem0058service-icsdem0058.integration.us2.oraclecloud.com/integration/flowapi/rest/PROPOSENEWACTFOROOW2016/v01/actproposals
+  
+  localhost:5100/ics/integration/flowsvc/soap/PROPOSENEWACTFOR_SOAP/v01/?wsdl
+  
+  */
+ var targetPath = req.url.substring(4); // anything after /ics
+ var targetPort=443;
+ // credentials for ICS
+ var icsUsername= 'gse_cloud-admin@oracleads.com';
+ var icsPassword = 'bristlyYear5^';
+console.log('ICS request '+ req.method);
+ var targetUrl = "https://"+targetServer+":"+targetPort+targetPath;
+ console.log('forward path '+targetUrl);
+
+ var route_options ={};
+// delete route_options.protocol;
+ route_options.method = req.method;
+ route_options.uri = targetUrl;
+ route_options.json = req.body;
+ route_options.auth = {
+                        'user': icsUsername,
+                        'pass': icsPassword,
+                        'sendImmediately': false
+                      };
+ var route_request = request(route_options);
+ req.pipe(route_request).pipe(res);
+
+
+ } //handleICS
 
 /* deal with SOAP calls to SOACS */
 function handleSOACSPost(req, res) {
@@ -367,6 +464,15 @@ function handleArtists(req, res) {
 		 
 		 http://developer.echonest.com/api/v4/artist/biographies?api_key=0B3N8LMO4XG3BXPSY&id=AR6XZ861187FB4CECD&format=json&name=&results=1&start=0&license=cc-by-sa
 		 bio  = response.biographies[0].text (note: attribute url refers to original publication
+		 
+		 find news about artist:
+		 
+		 http://developer.echonest.com/api/v4/artist/news?api_key=0B3N8LMO4XG3BXPSY&id=spotify:artist:5l8VQNuIg0turYE1VtM9zV&format=json
+		 or
+		 http://developer.echonest.com/api/v4/artist/news?api_key=0B3N8LMO4XG3BXPSY&id=AR6XZ861187FB4CECD&format=json
+		 
+		 
+		 
 		 
 		 
 		 */
