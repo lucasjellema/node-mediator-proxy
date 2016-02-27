@@ -8,8 +8,8 @@ var https = require('https'),
 	 qs = require('querystring'),
 	 bodyParser = require('body-parser')
 	;
-var soap = require('soap');
-var xml2js = require('xml2js');
+var soap = require('soap'); //https://www.npmjs.com/package/soap
+var xml2js = require('xml2js'); //https://www.npmjs.com/package/xml2js
 /* docs:
 https://nodejs.org/api/https.html
 https://nodejs.org/api/http.html
@@ -37,8 +37,8 @@ https.get('https://mockdataapi-lucasjellema.apaas.em2.oraclecloud.com/department
   console.error('HTTPS error '+e);
 });
 */
-var PORT =80;
-//var PORT =5100;
+//var PORT =80;
+var PORT =5100;
 
 var options = {
   host: targetServer,
@@ -112,7 +112,29 @@ app.use(bodyParser.text({ type: 'text/xml' }))
 app.post('/ics/*', function(req,res){ handleICSPost(req, res);} );
 app.get('/ics/*', function(req,res){ handleICS(req, res);} );
 
-app.get('/artists/*', function(req,res){ handleArtists(req, res);} );
+//app.get('/artists/*', function(req,res){ handleArtists(req, res);} );
+app.get('/artists/*', function(req,res){ handleArtistsAPI(req, res);} );
+
+
+/* deal with HTTP calls to ArtistAPI */
+function handleArtistsAPI(req, res) {
+
+ var targetServer = "artist-enricher-api-lucasjellema.apaas.em2.oraclecloud.com";
+
+ var targetPath = req.url.substring(8); // anything after /artists
+ var targetPort=443;
+ var targetUrl = "https://"+targetServer+":"+targetPort+targetPath;
+ console.log('forward path '+targetUrl);
+
+ var route_options ={};
+ route_options.method = req.method;
+ route_options.uri = targetUrl;
+ route_options.json = req.body;
+ var route_request = request(route_options);
+ req.pipe(route_request).pipe(res);
+
+ } //handleArtistsAPI
+
 
 
 /* deal with (REST and SOAP) calls to ICS */
