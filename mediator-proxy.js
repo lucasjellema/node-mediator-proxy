@@ -37,8 +37,8 @@ https.get('https://mockdataapi-lucasjellema.apaas.em2.oraclecloud.com/department
   console.error('HTTPS error '+e);
 });
 */
-//var PORT =80;
-var PORT =5100;
+var PORT =80;
+//var PORT =5100;
 
 var options = {
   host: targetServer,
@@ -145,12 +145,14 @@ function handleICSPost(req, res) {
  {
  var icsUsername= 'gse_cloud-admin@oracleads.com';
  var icsPassword = 'bristlyYear5^';
- var url = 'https://icsdem0058service-icsdem0058.integration.us2.oraclecloud.com:443/integration/flowsvc/soap/PROPOSENEWACTFOR_SOAP/v01/?wsdl';
 
  // turn SOAP Envelope to JSON object
  xml2js.parseString(req.body, function (err, result) {
     //when parsing is one, interpret the object
 	var body = result['soapenv:Envelope']['soapenv:Body'];
+	
+	console.log(body);
+	if (body[0]['aced:submitActProposalRequestMessage']) {
 	var request = body[0]['aced:submitActProposalRequestMessage'];
 	
     var actProposal = { artistName: request[0]['aced:artistName']
@@ -159,22 +161,44 @@ function handleICSPost(req, res) {
                       ,imageURL : request[0]['aced:imageUrl']
                       };
 	// create a JavaScript proxy-client for the WebService at the specified URL (in ICS)				  
+	 var url = 'https://icsdem0058service-icsdem0058.integration.us2.oraclecloud.com:443/integration/flowsvc/soap/PROPOSENEWACTFOR_SOAP/v01/?wsdl';
     soap.createClient(url, function(err, client) {		
 	  // this setting is required for ICS
 	  client.setSecurity(new soap.WSSecurity(icsUsername, icsPassword))
       client.submitActProposal
       ( actProposal
 	  , function(err, result, raw, soapHeader) {
-            console.log("result is in for submitActProposal "+result );
-	        console.log(result['proposedActId']);
-	        console.log("error  for submitActProposal "+ err);
-            console.log("submitActProposal raw "+raw);
             res.end(raw);
         }// callback on response from SOAP WebService
       );
     }
     );//createClient
+   }// if 	submitActProposalRequestMessage
+   else {   
+	if (body[0]['aced:verifyExistenceProposalRequestMessage']) {
+	var request = body[0]['aced:verifyExistenceProposalRequestMessage'];
+	console.log('verifyExistenceProposalRequestMessage');
 	
+    var verifyAct = { name: request[0]['aced:name']
+                      };
+	console.log('verifyExistenceProposalRequestMessage: '+verifyAct.artistName);
+	 var url = 'https://icsdem0058service-icsdem0058.integration.us2.oraclecloud.com/integration/flowsvc/soap/VERIFYEXISTENCEO_FROMSOACS/v01/?wsdl';
+
+					  // create a JavaScript proxy-client for the WebService at the specified URL (in ICS)				  
+    soap.createClient(url, function(err, client) {		
+	  // this setting is required for ICS
+	  client.setSecurity(new soap.WSSecurity(icsUsername, icsPassword))
+      client.verifyExistenceActProposal
+      ( verifyAct
+	  , function(err, result, raw, soapHeader) {
+            res.end(raw);
+        }// callback on response from SOAP WebService
+      );
+    }
+    );//createClient
+   }// if 	verifyExistenceProposalRequestMessage
+   };//else
+   
 });//xml2js
 }//else
 }// handICSPost
