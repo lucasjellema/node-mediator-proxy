@@ -2,12 +2,13 @@
 
 var https = require('https'),
     http = require('http'),
+    fs = require('fs'),
     //httpProxy = require('http-proxy'),
 	url = require('url'),
 	request = require('request'),
 	 qs = require('querystring'),
-	 bodyParser = require('body-parser')
-	;
+	 bodyParser = require('body-parser'),
+dateFormat = require('dateformat');
 var soap = require('soap'); //https://www.npmjs.com/package/soap
 var xml2js = require('xml2js'); //https://www.npmjs.com/package/xml2js
 /* docs:
@@ -21,6 +22,7 @@ https://github.com/request/request
 var express = require('express');
 var app = express();
 
+var logFile = 'mediator-proxy.txt';
 var targetServer = "mockdataapi-lucasjellema.apaas.em2.oraclecloud.com";
 //var targetServer = "data-api-lucasjellema.apaas.em2.oraclecloud.com"
 /*
@@ -37,8 +39,8 @@ https.get('https://mockdataapi-lucasjellema.apaas.em2.oraclecloud.com/department
   console.error('HTTPS error '+e);
 });
 */
-var PORT =80;
-//var PORT =5100;
+//var PORT =80;
+var PORT =5100;
 
 var options = {
   host: targetServer,
@@ -94,6 +96,17 @@ console.log('request received: '+request.url);
     res.write("No Data Requested, so none is returned");
     res.end();
 });
+
+app.get('/logs', function(req, res) {
+
+    res.writeHead(200, {
+        'Content-Type': 'text/plain'    });
+
+    var readStream = fs.createReadStream(logFile);
+    readStream.pipe(res);
+  
+  });
+
 
 // Say hello!
 app.get('/hello', function(req, res) {
@@ -231,6 +244,9 @@ console.log('ICS request '+ req.method);
  var targetUrl = "https://"+targetServer+":"+targetPort+targetPath;
  console.log('forward path '+targetUrl);
 
+ addToLogFile( "\n["+dateFormat(new Date(), "dddd, mmmm dS, yyyy, h:MM:ss TT")+"] Handle ICS REST "+req.method+" Request to "+targetUrl);
+ addToLogFile( "\nBody:\n"+JSON.stringify(req.body)+ "\n ");
+ 
  var route_options ={};
 // delete route_options.protocol;
  route_options.method = req.method;
@@ -567,3 +583,9 @@ req.end();
 */
 } //handleArtists
 
+function addToLogFile( logEntry) {
+  fs.appendFile(logFile, logEntry, function(err)  {
+  if (err) console.log("Error happened while write to log file "+err);
+  
+});
+}

@@ -1,0 +1,20 @@
+Handle ICS REST POST Request to https://icsdem0058service-icsdem0058.integration.us2.oraclecloud.com:443/integration/flowapi/rest/IOTCS_DROPOF_REST_TO_COMMUN/v01/iot-eventsBody:[object Object]Handle ICS REST POST Request to https://icsdem0058service-icsdem0058.integration.us2.oraclecloud.com:443/integration/flowapi/rest/IOTCS_DROPOF_REST_TO_COMMUN/v01/iot-eventsBody:[{"id":"Id Value","source":"someValue","sentTime":"someOtherValue","eventTime":"someEventOtherValue","payload":{"data":{"max_of_data_hashtag":"talking heads","count_of_data_hashtag":48}}}]Handle ICS REST POST Request to https://icsdem0058service-icsdem0058.integration.us2.oraclecloud.com:443/integration/flowapi/rest/IOTCS_DROPOF_REST_TO_COMMUN/v01/iot-events
+Body:
+[{"id":"Id Value","source":"someValue","sentTime":"someOtherValue","eventTime":"someEventOtherValue","payload":{"data":{"max_of_data_hashtag":"talking heads","count_of_data_hashtag":48}}}]
+ 
+[Date.now()] Handle ICS REST POST Request to https://icsdem0058service-icsdem0058.integration.us2.oraclecloud.com:443/integration/flowapi/rest/IOTCS_DROPOF_REST_TO_COMMUN/v01/iot-events
+Body:
+[{"id":"Id Value","source":"someValue","sentTime":"someOtherValue","eventTime":"someEventOtherValue","payload":{"data":{"max_of_data_hashtag":"talking heads","count_of_data_hashtag":48}}}]
+ 
+1457028152979 Handle ICS REST POST Request to https://icsdem0058service-icsdem0058.integration.us2.oraclecloud.com:443/integration/flowapi/rest/IOTCS_DROPOF_REST_TO_COMMUN/v01/iot-events
+Body:
+[{"id":"Id Value","source":"someValue","sentTime":"someOtherValue","eventTime":"someEventOtherValue","payload":{"data":{"max_of_data_hashtag":"talking heads","count_of_data_hashtag":48}}}]
+ 
+[Thursday, March 3rd, 2016, 7:08:41 PM] Handle ICS REST POST Request to https://icsdem0058service-icsdem0058.integration.us2.oraclecloud.com:443/integration/flowapi/rest/IOTCS_DROPOF_REST_TO_COMMUN/v01/iot-events
+Body:
+[{"id":"Id Value","source":"someValue","sentTime":"someOtherValue","eventTime":"someEventOtherValue","payload":{"data":{"max_of_data_hashtag":"talking heads","count_of_data_hashtag":48}}}]
+ 
+[Thursday, March 3rd, 2016, 7:11:55 PM] Handle ICS REST POST Request to https://icsdem0058service-icsdem0058.integration.us2.oraclecloud.com:443/integration/flowapi/rest/IOTCS_DROPOF_REST_TO_COMMUN/v01/iot-events
+Body:
+[{"id":"Id Value","source":"someValue","sentTime":"someOtherValue","eventTime":"someEventOtherValue","payload":{"data":{"max_of_data_hashtag":"runrig","count_of_data_hashtag":48}}}]
+ 
