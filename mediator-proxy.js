@@ -162,15 +162,17 @@ function handleICSPost(req, res) {
  var icsUsername= 'gse_cloud-admin@oracleads.com';
  var icsPassword = 'bristlyYear5^';
 
-  addToLogFile( "\n["+dateFormat(new Date(), "dddd, mmmm dS, yyyy, h:MM:ss TT")+"] Handle ICS POST "+req.method+" Request to "+req.url);
- addToLogFile( "\nBody:\n"+JSON.stringify(req.body)+ "\n ");
+ addToLogFile( "\n["+dateFormat(new Date(), "dddd, mmmm dS, yyyy, h:MM:ss TT")+"] Handle ICS POST "+req.method+" Request to "+req.url);
+ addToLogFile( "\nBody:\n"+req.body+ "\n ");
 
  // turn SOAP Envelope to JSON object
  xml2js.parseString(req.body, function (err, result) {
- 
+    addToLogFile( "\n JSON Result of parsing HTTP BODY:\n"+JSON.stringify(result)+ "\n ");
+
     //when parsing is done, interpret the object
-	var body = result['soapenv:Envelope']['soapenv:Body'];
- addToLogFile( "\nSoap Body:\n"+JSON.stringify(body)+ "\n ");
+	var body = result[0][0];
+	//var body = result['soapenv:Envelope']['soapenv:Body'];
+    addToLogFile( "\nSoap Body :\n"+JSON.stringify(body)+ "\n ");
 	
 	console.log(JSON.stringify(body));
 	if (body[0]['aced:submitActProposalRequestMessage']) {
