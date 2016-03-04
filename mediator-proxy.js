@@ -235,6 +235,7 @@ function handleICSPost(req, res) {
       ( actProposal
 	  , function(err, result, raw, soapHeader) {      
             addToLogFile( "\n => Soap Response for Submit Response Body :\n"+raw+ "\n ");
+			res.writeHead(200, {'Content-Type': 'text/xml'});
             res.end(raw);
         }// callback on response from SOAP WebService
       );
