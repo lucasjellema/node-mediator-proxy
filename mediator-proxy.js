@@ -132,6 +132,19 @@ app.get('/ics/*', function(req,res){ handleICS(req, res);} );
 app.get('/artists/*', function(req,res){ handleArtistsAPI(req, res);} );
 
 
+function searchKeyWithValue( obj, value ){
+    for( var key in obj ) {
+        if( typeof obj[key] === 'object' ){
+            var result = searchKeyWithValue( obj[key], value );
+			if (result) {return result;};
+        }
+        if( obj[key] == value ){
+		    return key;
+        }
+    }//for
+    return null;
+}//searchKeyWithValue
+
 /* deal with HTTP calls to ArtistAPI */
 function handleArtistsAPI(req, res) {
 
@@ -166,22 +179,23 @@ function handleICSPost(req, res) {
  addToLogFile( "\nBody:\n"+req.body+ "\n ");
 
  // turn SOAP Envelope to JSON object
- xml2js.parseString(req.body, function (err, result) {
+ xml2js.parseString(req.body
+ , function (err, result) {
     addToLogFile( "\n JSON Result of parsing HTTP BODY:\n"+JSON.stringify(result)+ "\n ");
 
+	var soapNSPrefix = searchKeyWithValue( result, "http://schemas.xmlsoap.org/soap/envelope/" ).substring(6);
+	var acedNSPrefix = searchKeyWithValue( result, "aced.cloud.demo" ).substring(6);;
+	
     //when parsing is done, interpret the object
-	var body = result[0][0];
-	//var body = result['soapenv:Envelope']['soapenv:Body'];
+	var body = result[soapNSPrefix+':Envelope'][soapNSPrefix+':Body'];
     addToLogFile( "\nSoap Body :\n"+JSON.stringify(body)+ "\n ");
 	
-	console.log(JSON.stringify(body));
-	if (body[0]['aced:submitActProposalRequestMessage']) {
-	var request = body[0]['aced:submitActProposalRequestMessage'];
-	
-    var actProposal = { artistName: request[0]['aced:artistName']
-                      , numberOfVotes :  request[0]['aced:numberOfVotes']
-                      , description: request[0]['aced:description']
-                      ,imageURL : request[0]['aced:imageUrl']
+	if (body[0][acedNSPrefix+':submitActProposalRequestMessage']) {
+   	  var request = body[0][acedNSPrefix+':submitActProposalRequestMessage'];	
+    var actProposal = { artistName: request[0][acedNSPrefix+':artistName']
+                      , numberOfVotes :  request[0][acedNSPrefix+':numberOfVotes']
+                      , description: request[0][acedNSPrefix+':description']
+                      ,imageURL : request[0][acedNSPrefix+':imageUrl']
                       };
 	// create a JavaScript proxy-client for the WebService at the specified URL (in ICS)				  
 	 var url = 'https://icsdem0058service-icsdem0058.integration.us2.oraclecloud.com:443/integration/flowsvc/soap/PROPOSENEWACTFOR_SOAP/v01/?wsdl';
@@ -198,15 +212,16 @@ function handleICSPost(req, res) {
     );//createClient
    }// if 	submitActProposalRequestMessage
    else {   
- addToLogFile( "\nbody[0]:\n"+JSON.stringify(body[0])+ "\n ");
+    addToLogFile( "\nbody[0]:\n"+JSON.stringify(body[0])+ "\n ");
+	var acedNSPrefix = searchKeyWithValue( result, "aced.cloud.demo" ).substring(6);;
 
-   if (body[0]['aced:verifyExistenceProposalRequestMessage']) {
-	var request = body[0]['aced:verifyExistenceProposalRequestMessage'];
+   if (body[0][acedNSPrefix+':verifyExistenceProposalRequestMessage']) {
+	var request = body[0][acedNSPrefix+':verifyExistenceProposalRequestMessage'];
 	console.log('verifyExistenceProposalRequestMessage');
 	
-    var verifyAct = { name: request[0]['aced:name']
+    var verifyAct = { name: request[0][acedNSPrefix+':name']
                       };
-	console.log('verifyExistenceProposalRequestMessage: '+verifyAct.artistName);
+	console.log('verifyExistenceProposalRequestMessage: '+verifyAct.name);
 	 var url = 'https://icsdem0058service-icsdem0058.integration.us2.oraclecloud.com/integration/flowsvc/soap/VERIFYEXISTENCEO_FROMSOACS/v01/?wsdl';
 
 					  // create a JavaScript proxy-client for the WebService at the specified URL (in ICS)				  
