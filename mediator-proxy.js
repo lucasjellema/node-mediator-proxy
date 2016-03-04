@@ -248,7 +248,15 @@ console.log('ICS request '+ req.method);
  addToLogFile( "\nBody:\n"+JSON.stringify(req.body)+ "\n ");
  
  var route_options ={};
-// delete route_options.protocol;
+ var url_parts = url.parse(req.url, true);
+ var query = url_parts.query;
+ var isWsdlRequest = false;
+ if (query.hasOwnProperty('wsdl')) {
+   console.log("Request a WSDL document");
+    isWsdlRequest = true;
+ }
+ 
+ // delete route_options.protocol;
  route_options.method = req.method;
  route_options.uri = targetUrl;
  route_options.json = req.body;
@@ -257,10 +265,20 @@ console.log('ICS request '+ req.method);
                         'pass': icsPassword,
                         'sendImmediately': false
                       };
- var route_request = request(route_options);
- req.pipe(route_request).pipe(res);
-
-
+ if (isWsdlRequest) {
+    request(route_options, function (error, response, body) {
+    if (!error && response.statusCode == 200) {
+	  // replace endpoint references in WSDL document to ICS with references to proxy:
+      var data = body.replace("https://icsdem0058service-icsdem0058.integration.us2.oraclecloud.com:443","http://104.155.85.98/ics");
+      res.writeHead(response.statusCode, response.headers);
+      res.end(data);
+	}
+  });//request
+ } 
+else {
+  var route_request = request(route_options);
+  req.pipe(route_request).pipe(res);
+} 
  } //handleICS
 
 /* deal with SOAP calls to SOACS */
