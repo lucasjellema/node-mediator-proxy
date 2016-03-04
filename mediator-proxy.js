@@ -196,7 +196,10 @@ function handleICSPost(req, res) {
 	console.log('soapNSPrefix'+soapNSPrefix);
 	var body = result[soapNSPrefix+':Envelope'][soapNSPrefix+':Body'];
     addToLogFile( "\nSoap Body :\n"+JSON.stringify(body)+ "\n ");
-	
+	console.log("body part 0 "+JSON.stringify(body[0]));
+	   
+	if ( JSON.stringify(body[0]).indexOf("submitActProposalRequestMessage") > -1 ){
+	   
 
 	var acedXMLNSPrefix = searchKeyWithValue( body[0], "aced.cloud.demo.ics" );
 	console.log('acedXMLNSPrefix'+acedXMLNSPrefix);
@@ -238,7 +241,10 @@ function handleICSPost(req, res) {
     }
     );//createClient
    }// if 	submitActProposalRequestMessage
-   else {   
+   }
+	   
+	if ( JSON.stringify(body[0]).indexOf("verifyExistenceProposalRequestMessage") > -1) {
+	   console.log("verifyExistenceProposalRequestMessage");
     addToLogFile( "\nbody[0]:\n"+JSON.stringify(body[0])+ "\n ");
 	var acedXMLNSPrefix = searchKeyWithValue( body[0], "aced.cloud.demo" );
 	if (!acedXMLNSPrefix) {
@@ -281,7 +287,7 @@ function handleICSPost(req, res) {
     }
     );//createClient
    }// if 	verifyExistenceProposalRequestMessage
-   };//else
+   };//verifyExistenceProposalRequestMessage
    
 });//xml2js
 }//else
