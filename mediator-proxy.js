@@ -73,21 +73,6 @@ if (module === require.main) {
 
 module.exports = app;
 
-
-/*
-var req = https.request(options, function(res) {
-  console.log(res.statusCode);
-  res.on('data', function(d) {
-    process.stdout.write(d);
-  });
-});
-req.end();
-console.log(req._headers);
-
-req.on('error', function(e) {
-  console.error("https call failed "+e);
-});
-*/
 // curl -vIX GET https://mockdataapi-lucasjellema.apaas.em2.oraclecloud.com/departments
 
 //curl -vIX GET  https://data-api-lucasjellema.apaas.em2.oraclecloud.com/departments/90
@@ -127,6 +112,7 @@ app.use(bodyParser.json()); // for parsing application/json
 app.use(bodyParser.text({ type: 'text/xml' }))
 app.post('/ics/*', function(req,res){ handleICSPost(req, res);} );
 app.get('/ics/*', function(req,res){ handleICS(req, res);} );
+app.post('/pcs/*', function(req,res){ handlePCSPost(req, res);} );
 
 //app.get('/artists/*', function(req,res){ handleArtists(req, res);} );
 app.get('/artists/*', function(req,res){ handleArtistsAPI(req, res);} );
@@ -164,6 +150,81 @@ function handleArtistsAPI(req, res) {
 
  } //handleArtistsAPI
 
+ 
+/* deal with SOAP calls to PCS */
+function handlePCSPost(req, res) {
+ var targetServer = "pcs-gse00000225.process.us2.oraclecloud.com";
+  /*https://pcs-gse00000225.process.us2.oraclecloud.com:443/soa-infra/services/default/TakeThree!1*soa_8a16e235-9036-4d22-bc36-f5a32c2b496e/KickOffApproval.service?wsdl
+  */
+ var pcsUsername= 'cloud.admin';
+ var pcsPassword = 'gLvHRTttU_7A';
+
+ addToLogFile( "\n["+dateFormat(new Date(), "dddd, mmmm dS, yyyy, h:MM:ss TT")+"] Handle PCS POST "+req.method+" Request to "+req.url);
+ addToLogFile( "\nBody:\n"+req.body+ "\n ");
+
+ // turn SOAP Envelope to JSON object
+ xml2js.parseString(req.body
+ , function (err, result) {
+    addToLogFile( "\n JSON Result of parsing HTTP BODY:\n"+JSON.stringify(result)+ "\n ");
+
+	var soapNSPrefix = searchKeyWithValue( result, "http://schemas.xmlsoap.org/soap/envelope/" ).substring(6);
+	console.log('soapNSPrefix'+soapNSPrefix);
+	var body = result[soapNSPrefix+':Envelope'][soapNSPrefix+':Body'];
+    addToLogFile( "\nSoap Body :\n"+JSON.stringify(body)+ "\n ");
+	console.log("body part 0 "+JSON.stringify(body[0]));
+	   
+	if ( JSON.stringify(body[0]).indexOf("start") > -1 ){
+	   
+
+	var acedXMLNSPrefix = searchKeyWithValue( body[0], "http://xmlns.oracle.com/bpmn/bpmnCloudProcess/TakeThree/KickOffApproval" );
+	console.log('acedXMLNSPrefix'+acedXMLNSPrefix);
+	if (!acedXMLNSPrefix) {
+	  acedXMLNSPrefix = searchKeyWithValue( result, "http://xmlns.oracle.com/bpmn/bpmnCloudProcess/TakeThree/KickOffApproval" );
+	console.log('not found at first - acedXMLNSPrefix'+acedXMLNSPrefix);
+	}
+	var acedPrefix ="";
+	
+	if ("xmlns"===acedXMLNSPrefix) {acedPrefix ="";}
+	else {acedPrefix =acedXMLNSPrefix.substring(6)+":";};
+	
+	console.log('acedPrefix'+acedPrefix);
+
+
+	console.log('acedNSPrefix'+acedPrefix);
+    //when parsing is done, interpret the object
+	if (body[0][acedPrefix+'start']) {
+   	  var r = body[0][acedPrefix+'start'];	
+	console.log('r : '+JSON.stringify(r));
+	  
+    var actProposal = { name:  r[0]['name']
+                      , voteCount :  r[0]['voteCount']
+                      };
+	console.log('actproposal : '+JSON.stringify(actProposal));
+
+					  // create a JavaScript proxy-client for the WebService at the specified URL (in ICS)				  
+	 var urlWSDL = 'https://pcs-gse00000225.process.us2.oraclecloud.com:443/soa-infra/services/default/TakeThree!1*soa_8a16e235-9036-4d22-bc36-f5a32c2b496e/KickOffApproval.service?wsdl';
+    soap.createClient(urlWSDL, function(err, client) {		
+	  // this setting is required for ICS
+	  client.setSecurity(new soap.WSSecurity(pcsUsername, pcsPassword))
+      client.start
+      ( actProposal
+	  , function(err, result, raw, soapHeader) {      
+            addToLogFile( "\n => Soap Response for Submit Response Body :\n"+raw+ "\n ");
+			res.writeHead(200, {'Content-Type': 'text/xml'});
+            res.end(raw);
+        }// callback on response from SOAP WebService
+      );
+    }
+    );//createClient
+   }// if 	start
+   }
+   
+});//xml2js
+
+} //handlePCSPost
+ 
+ 
+ 
 function getValue(property, prefix, obj) {
 console.log('extract property '+ property+' - prfefix '+' - obj '+JSON.stringify(obj) );
   var value = obj[prefix+property];
