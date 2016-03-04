@@ -184,8 +184,9 @@ function handleICSPost(req, res) {
     addToLogFile( "\n JSON Result of parsing HTTP BODY:\n"+JSON.stringify(result)+ "\n ");
 
 	var soapNSPrefix = searchKeyWithValue( result, "http://schemas.xmlsoap.org/soap/envelope/" ).substring(6);
+	console.log('soapNSPrefix'+soapNSPrefix);
 	var acedNSPrefix = searchKeyWithValue( result, "aced.cloud.demo" ).substring(6);;
-	
+	console.log('acedNSPrefix'+acedNSPrefix);
     //when parsing is done, interpret the object
 	var body = result[soapNSPrefix+':Envelope'][soapNSPrefix+':Body'];
     addToLogFile( "\nSoap Body :\n"+JSON.stringify(body)+ "\n ");
@@ -213,16 +214,29 @@ function handleICSPost(req, res) {
    }// if 	submitActProposalRequestMessage
    else {   
     addToLogFile( "\nbody[0]:\n"+JSON.stringify(body[0])+ "\n ");
-	var acedNSPrefix = searchKeyWithValue( result, "aced.cloud.demo" ).substring(6);;
-
-   if (body[0][acedNSPrefix+':verifyExistenceProposalRequestMessage']) {
-	var request = body[0][acedNSPrefix+':verifyExistenceProposalRequestMessage'];
-	console.log('verifyExistenceProposalRequestMessage');
+	var acedXMLNSPrefix = searchKeyWithValue( body[0], "aced.cloud.demo" );
+	if (!acedXMLNSPrefix) {
+	  acedXMLNSPrefix = searchKeyWithValue( result, "aced.cloud.demo" );
+	}
+	var acedPrefix ="";
 	
-    var verifyAct = { name: request[0][acedNSPrefix+':name']
+	if ("xmlns"===acedXMLNSPrefix) {acedPrefix ="";}
+	else {acedPrefix =acedXMLNSPrefix.substring(6)+":";};
+	
+   if (body[0][acedPrefix+'verifyExistenceProposalRequestMessage']) {
+
+   var request = body[0][acedPrefix+'verifyExistenceProposalRequestMessage'];
+	var artistName = request[0][acedPrefix+'name'];
+	// deal with calls from PCS
+	if (artistName[0] && artistName[0]["_"]) {
+	  artistName = artistName[0]["_"]
+	}
+	
+    var verifyAct = { name: artistName
                       };
-	console.log('verifyExistenceProposalRequestMessage: '+verifyAct.name);
-	 var url = 'https://icsdem0058service-icsdem0058.integration.us2.oraclecloud.com/integration/flowsvc/soap/VERIFYEXISTENCEO_FROMSOACS/v01/?wsdl';
+    addToLogFile( "\n => Go invoke ICS - Verify Existence - with  :\n"+JSON.stringify(verifyAct)+ "\n ");
+
+	var url = 'https://icsdem0058service-icsdem0058.integration.us2.oraclecloud.com/integration/flowsvc/soap/VERIFYEXISTENCEO_FROMSOACS/v01/?wsdl';
 
 					  // create a JavaScript proxy-client for the WebService at the specified URL (in ICS)				  
     soap.createClient(url, function(err, client) {		
@@ -231,6 +245,7 @@ function handleICSPost(req, res) {
       client.verifyExistenceActProposal
       ( verifyAct
 	  , function(err, result, raw, soapHeader) {
+            addToLogFile( "\n => Soap Response Body :\n"+raw+ "\n ");
             res.end(raw);
         }// callback on response from SOAP WebService
       );
