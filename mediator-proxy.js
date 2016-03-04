@@ -6,9 +6,10 @@ var https = require('https'),
     //httpProxy = require('http-proxy'),
 	url = require('url'),
 	request = require('request'),
-	 qs = require('querystring'),
-	 bodyParser = require('body-parser'),
-dateFormat = require('dateformat');
+	qs = require('querystring'),
+	bodyParser = require('body-parser'),
+    dateFormat = require('dateformat');
+
 var soap = require('soap'); //https://www.npmjs.com/package/soap
 var xml2js = require('xml2js'); //https://www.npmjs.com/package/xml2js
 /* docs:
@@ -41,6 +42,8 @@ https.get('https://mockdataapi-lucasjellema.apaas.em2.oraclecloud.com/department
 */
 var PORT =80;
 //var PORT =5100;
+
+var proxyServerIP = "104.155.85.98";
 
 var options = {
   host: targetServer,
@@ -159,12 +162,17 @@ function handleICSPost(req, res) {
  var icsUsername= 'gse_cloud-admin@oracleads.com';
  var icsPassword = 'bristlyYear5^';
 
+  addToLogFile( "\n["+dateFormat(new Date(), "dddd, mmmm dS, yyyy, h:MM:ss TT")+"] Handle ICS POST "+req.method+" Request to "+req.url);
+ addToLogFile( "\nBody:\n"+JSON.stringify(req.body)+ "\n ");
+
  // turn SOAP Envelope to JSON object
  xml2js.parseString(req.body, function (err, result) {
-    //when parsing is one, interpret the object
+ 
+    //when parsing is done, interpret the object
 	var body = result['soapenv:Envelope']['soapenv:Body'];
+ addToLogFile( "\nSoap Body:\n"+JSON.stringify(body)+ "\n ");
 	
-	console.log(body);
+	console.log(JSON.stringify(body));
 	if (body[0]['aced:submitActProposalRequestMessage']) {
 	var request = body[0]['aced:submitActProposalRequestMessage'];
 	
@@ -188,7 +196,9 @@ function handleICSPost(req, res) {
     );//createClient
    }// if 	submitActProposalRequestMessage
    else {   
-	if (body[0]['aced:verifyExistenceProposalRequestMessage']) {
+ addToLogFile( "\nbody[0]:\n"+JSON.stringify(body[0])+ "\n ");
+
+   if (body[0]['aced:verifyExistenceProposalRequestMessage']) {
 	var request = body[0]['aced:verifyExistenceProposalRequestMessage'];
 	console.log('verifyExistenceProposalRequestMessage');
 	
@@ -269,7 +279,7 @@ console.log('ICS request '+ req.method);
     request(route_options, function (error, response, body) {
     if (!error && response.statusCode == 200) {
 	  // replace endpoint references in WSDL document to ICS with references to proxy:
-      var data = body.replace("https://icsdem0058service-icsdem0058.integration.us2.oraclecloud.com:443","http://104.155.85.98/ics");
+      var data = body.replace("https://icsdem0058service-icsdem0058.integration.us2.oraclecloud.com:443","http://"+proxyServerIP+"/ics");
       res.writeHead(response.statusCode, response.headers);
       res.end(data);
 	}
@@ -335,7 +345,7 @@ console.log("query:"+query);
 	data=data+d;
     console.log("data = "+data);
 	// replace references to SOA CS machine with references to proxy service
-	data = data.replace("140.86.4.95:8080/soa-infra","104.155.85.98/soacs/soa-infra");
+	data = data.replace("140.86.4.95:8080/soa-infra",proxyServerIP+"/soacs/soa-infra");
   });//data
 
   res.on('end', function() {
