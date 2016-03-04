@@ -205,8 +205,8 @@ function handleICSPost(req, res) {
 	  client.setSecurity(new soap.WSSecurity(icsUsername, icsPassword))
       client.submitActProposal
       ( actProposal
-	  , function(err, result, raw, soapHeader) {
-            res.end(raw);
+	  , function(err, result, raw, soapHeader) {      
+  res.end(raw);
         }// callback on response from SOAP WebService
       );
     }
@@ -246,6 +246,8 @@ function handleICSPost(req, res) {
       ( verifyAct
 	  , function(err, result, raw, soapHeader) {
             addToLogFile( "\n => Soap Response Body :\n"+raw+ "\n ");
+			
+			res.writeHead(200, {'Content-Type': 'text/xml'});
             res.end(raw);
         }// callback on response from SOAP WebService
       );
