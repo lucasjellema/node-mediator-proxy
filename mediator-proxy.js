@@ -112,6 +112,7 @@ app.use(bodyParser.json()); // for parsing application/json
 app.use(bodyParser.text({ type: 'text/xml' }))
 app.post('/ics/*', function(req,res){ handleICSPost(req, res);} );
 app.get('/ics/*', function(req,res){ handleICS(req, res);} );
+app.get('/pcs/*', function(req,res){ handlePCSGet(req, res);} );
 app.post('/pcs/*', function(req,res){ handlePCSPost(req, res);} );
 
 //app.get('/artists/*', function(req,res){ handleArtists(req, res);} );
@@ -149,6 +150,52 @@ function handleArtistsAPI(req, res) {
  req.pipe(route_request).pipe(res);
 
  } //handleArtistsAPI
+
+
+/* deal with (WSDL get requests to PCS */
+function handlePCSGet(req, res) {
+
+ var targetServer = "pcs-gse00000225.process.us2.oraclecloud.com";
+ var targetPath = req.url.substring(4); // anything after /pcs
+ var targetPort=443;
+
+ console.log('PCS request '+ req.method);
+ var targetUrl = "https://"+targetServer+":"+targetPort+targetPath;
+ console.log('forward path '+targetUrl);
+
+ addToLogFile( "\n["+dateFormat(new Date(), "dddd, mmmm dS, yyyy, h:MM:ss TT")+"] Handle PCS REST "+req.method+" Request to "+targetUrl);
+ addToLogFile( "\nBody:\n"+JSON.stringify(req.body)+ "\n ");
+ 
+ var route_options ={};
+ var url_parts = url.parse(req.url, true);
+ var query = url_parts.query;
+ var isWsdlRequest = false;
+ if (query.hasOwnProperty('wsdl')) {
+   console.log("Request a WSDL document");
+    isWsdlRequest = true;
+ }
+ 
+ // delete route_options.protocol;
+ route_options.method = req.method;
+ route_options.uri = targetUrl;
+ route_options.json = req.body;
+/* route_options.auth = {
+                        'user': icsUsername,
+                        'pass': icsPassword,
+                        'sendImmediately': false
+                      };
+*/
+  if (isWsdlRequest) {
+    request(route_options, function (error, response, body) {
+    if (!error && response.statusCode == 200) {
+	  // replace all endpoint references in WSDL document to ICS with references to proxy:
+      var data = body.replace(/https\:\/\/pcs\-gse00000225\.process.us2\.oraclecloud\.com\:443/g,"http://"+proxyServerIP+"/pcs");
+      res.writeHead(response.statusCode, response.headers);
+      res.end(data);
+	}
+  });//request
+ } 
+ } //handlePCSGet
 
  
 /* deal with SOAP calls to PCS */
@@ -408,7 +455,8 @@ console.log('ICS request '+ req.method);
     request(route_options, function (error, response, body) {
     if (!error && response.statusCode == 200) {
 	  // replace endpoint references in WSDL document to ICS with references to proxy:
-      var data = body.replace("https://icsdem0058service-icsdem0058.integration.us2.oraclecloud.com:443","http://"+proxyServerIP+"/ics");
+      var data = body.replace(/https\:\/\/icsdem0058service\-icsdem0058\.integration\.us2\.oraclecloud\.com\:443/g,"http://"+proxyServerIP+"/ics");
+
       res.writeHead(response.statusCode, response.headers);
       res.end(data);
 	}
