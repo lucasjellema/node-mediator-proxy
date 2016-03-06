@@ -200,6 +200,11 @@ function handlePCSGet(req, res) {
  
 /* deal with SOAP calls to PCS */
 function handlePCSPost(req, res) {
+  if (req.url.indexOf('/pcs/rest/')> -1 ) { 
+//  if (req.url.startsWith("/pcs/rest")) {
+    handlePCSRestPost(req, res);
+    return;
+  }
  var targetServer = "pcs-gse00000225.process.us2.oraclecloud.com";
   /*https://pcs-gse00000225.process.us2.oraclecloud.com:443/soa-infra/services/default/TakeThree!1*soa_8a16e235-9036-4d22-bc36-f5a32c2b496e/KickOffApproval.service?wsdl
   */
@@ -270,6 +275,39 @@ function handlePCSPost(req, res) {
 
 } //handlePCSPost
  
+/* make a SOAP call to PCS based on a REST request and return a REST response, no matter how meaningless*/
+function handlePCSRestPost(req, res) {
+ var targetServer = "pcs-gse00000225.process.us2.oraclecloud.com";
+  /*https://pcs-gse00000225.process.us2.oraclecloud.com:443/soa-infra/services/default/TakeThree!1*soa_8a16e235-9036-4d22-bc36-f5a32c2b496e/KickOffApproval.service?wsdl
+  */
+ var pcsUsername= 'cloud.admin';
+ var pcsPassword = 'gLvHRTttU_7A';
+
+ addToLogFile( "\n["+dateFormat(new Date(), "dddd, mmmm dS, yyyy, h:MM:ss TT")+"] Handle PCS REST POST and turn into one way SOAP Call"+req.method+" Request to "+req.url);
+ addToLogFile( "\nBody:\n"+JSON.stringify(req.body)+ "\n ");
+ 
+    var actProposal = { name:  req.body.artistProposal.artistName
+                      , voteCount :  req.body.artistProposal.numberOfVotes
+                      };
+	console.log('actproposal : '+JSON.stringify(actProposal));
+
+					  // create a JavaScript proxy-client for the WebService at the specified URL (in ICS)				  
+	 var urlWSDL = 'https://pcs-gse00000225.process.us2.oraclecloud.com:443/soa-infra/services/default/TakeThree!1*soa_8a16e235-9036-4d22-bc36-f5a32c2b496e/KickOffApproval.service?wsdl';
+    soap.createClient(urlWSDL, function(err, client) {		
+	  // this setting is required for ICS
+	  client.setSecurity(new soap.WSSecurity(pcsUsername, pcsPassword))
+      client.start
+      ( actProposal
+	  , function(err, result, raw, soapHeader) {      
+			res.writeHead(200, {'Content-Type': 'application/json'});
+			var response = {"artistProposalSubmissionResult" : { "status" : "OK, I guess for "+ actProposal.name}};
+            res.end(JSON.stringify(response));
+        }// callback on response from SOAP WebService
+      );//clientStart
+    }
+    );//createClient
+   
+} //handlePCSRestPost
  
  
 function getValue(property, prefix, obj) {
