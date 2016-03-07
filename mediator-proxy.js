@@ -225,58 +225,131 @@ function handlePCSPost(req, res) {
     addToLogFile( "\nSoap Body :\n"+JSON.stringify(body)+ "\n ");
 	console.log("body part 0 "+JSON.stringify(body[0]));
 	   
-	if ( JSON.stringify(body[0]).indexOf("start") > -1 ){
-	   
-
-	var acedXMLNSPrefix = searchKeyWithValue( body[0], "http://xmlns.oracle.com/bpmn/bpmnCloudProcess/TakeThree/KickOffApproval" );
-	console.log('acedXMLNSPrefix'+acedXMLNSPrefix);
-	if (!acedXMLNSPrefix) {
-	  acedXMLNSPrefix = searchKeyWithValue( result, "http://xmlns.oracle.com/bpmn/bpmnCloudProcess/TakeThree/KickOffApproval" );
-	console.log('not found at first - acedXMLNSPrefix'+acedXMLNSPrefix);
-	}
-	var acedPrefix ="";
+	// test for TakeThree namespace   
+	if ( JSON.stringify(result).indexOf("http://xmlns.oracle.com/bpmn/bpmnCloudProcess/TakeThree/KickOffApproval") > -1 ){
+	  var acedXMLNSPrefix = searchKeyWithValue( body[0], "http://xmlns.oracle.com/bpmn/bpmnCloudProcess/TakeThree/KickOffApproval" );
+	  console.log('acedXMLNSPrefix'+acedXMLNSPrefix);
+	  if (!acedXMLNSPrefix) {
+	    acedXMLNSPrefix = searchKeyWithValue( result, "http://xmlns.oracle.com/bpmn/bpmnCloudProcess/TakeThree/KickOffApproval" );
+	    console.log('not found at first - acedXMLNSPrefix'+acedXMLNSPrefix);
+   	  }
+	  var acedPrefix ="";
 	
-	if ("xmlns"===acedXMLNSPrefix) {acedPrefix ="";}
-	else {acedPrefix =acedXMLNSPrefix.substring(6)+":";};
-	
-	console.log('acedPrefix'+acedPrefix);
-
-
-	console.log('acedNSPrefix'+acedPrefix);
-    //when parsing is done, interpret the object
-	if (body[0][acedPrefix+'start']) {
-   	  var r = body[0][acedPrefix+'start'];	
-	console.log('r : '+JSON.stringify(r));
+	  if ("xmlns"===acedXMLNSPrefix) {acedPrefix ="";}
+	  else {acedPrefix =acedXMLNSPrefix.substring(6)+":";};	
+	  console.log('acedPrefix'+acedPrefix);
+	  console.log('acedNSPrefix'+acedPrefix);
+      //when parsing is done, interpret the object
+	  if (body[0][acedPrefix+'start']) {
+   	    var r = body[0][acedPrefix+'start'];	
+	    console.log('r : '+JSON.stringify(r));
 	  
-    var actProposal = { name:  r[0]['name']
+        var actProposal = { name:  r[0]['name']
                       , voteCount :  r[0]['voteCount']
+                      };
+	    console.log('actproposal : '+JSON.stringify(actProposal));
+
+	    // create a JavaScript proxy-client for the WebService at the specified URL (in PCS)				  
+	    var urlWSDL = 'https://pcs-gse00000225.process.us2.oraclecloud.com:443/soa-infra/services/default/TakeThree!1*soa_8a16e235-9036-4d22-bc36-f5a32c2b496e/KickOffApproval.service?wsdl';
+        soap.createClient(urlWSDL, function(err, client) {		
+	    // this setting is required for PCS
+  	    client.setSecurity(new soap.WSSecurity(pcsUsername, pcsPassword))
+        client.start
+        ( actProposal
+	    , function(err, result, raw, soapHeader) {      
+            addToLogFile( "\n => Soap Response for Submit Response Body :\n"+raw+ "\n ");
+			res.writeHead(200, {'Content-Type': 'text/xml'});
+            res.end(raw);
+          }// callback on response from SOAP WebService
+        );
+      }
+      );//createClient
+     }// if 	start
+   }// if TakeThree namespace 
+
+	   
+	// test for ArtistProposalProcess/SubmitActProposal namespace   
+	if ( JSON.stringify(result).indexOf("http://xmlns.oracle.com/bpmn/bpmnCloudProcess/ArtistProposalProcess/SubmitActProposal") > -1 ){
+	  var acedXMLNSPrefix = searchKeyWithValue( body[0], "http://xmlns.oracle.com/bpmn/bpmnCloudProcess/ArtistProposalProcess/SubmitActProposal" );
+	  console.log('acedXMLNSPrefix'+acedXMLNSPrefix);
+	  if (!acedXMLNSPrefix) {
+	    acedXMLNSPrefix = searchKeyWithValue( result, "http://xmlns.oracle.com/bpmn/bpmnCloudProcess/ArtistProposalProcess/SubmitActProposal" );
+	    console.log('not found at first - acedXMLNSPrefix'+acedXMLNSPrefix);
+   	  }
+	  var acedPrefix ="";
+	
+	  if ("xmlns"===acedXMLNSPrefix) {acedPrefix ="";}
+	  else {acedPrefix =acedXMLNSPrefix.substring(6)+":";};	
+	  console.log('acedPrefix'+acedPrefix);
+	  console.log('acedNSPrefix'+acedPrefix);
+      //when parsing is done, interpret the object
+	  if (body[0][acedPrefix+'start']) {
+   	    var r = body[0][acedPrefix+'start'];	
+	    console.log('r : '+JSON.stringify(r));
+	  
+        var actProposal = { name:  r[0]['name']
+                      , voteCount :  r[0]['voteCount']
+                      };
+	    console.log('actproposal : '+JSON.stringify(actProposal));
+
+	    // create a JavaScript proxy-client for the WebService at the specified URL (in PCS)				  
+	    var urlWSDL = 'https://pcs-gse00000225.process.us2.oraclecloud.com/soa-infra/services/default/ArtistProposalProcess!1.0*soa_68f55698-0293-4386-b2f6-aa6ee69b497f/SubmitActProposal.service?WSDL';
+        soap.createClient(urlWSDL, function(err, client) {		
+	    // this setting is required for PCS
+  	    client.setSecurity(new soap.WSSecurity(pcsUsername, pcsPassword))
+        client.start
+        ( actProposal
+	    , function(err, result, raw, soapHeader) {      
+            addToLogFile( "\n => Soap Response for Submit Response Body :\n"+raw+ "\n ");
+			res.writeHead(200, {'Content-Type': 'text/xml'});
+            res.end(raw);
+          }// callback on response from SOAP WebService
+        );
+      }
+      );//createClient
+     }// if 	start
+   }// if ArtistProposalProcess/SubmitActProposal namespace  
+
+   
+  });//xml2js
+
+} //handlePCSPost
+ 
+/* make a SOAP call to PCS based on a REST request and return a REST response, no matter how meaningless*/
+function handlePCSRestPost(req, res) {
+ var targetServer = "pcs-gse00000225.process.us2.oraclecloud.com";
+ var pcsUsername= 'cloud.admin';
+ var pcsPassword = 'gLvHRTttU_7A';
+
+ addToLogFile( "\n["+dateFormat(new Date(), "dddd, mmmm dS, yyyy, h:MM:ss TT")+"] Handle PCS REST POST and turn into one way SOAP Call"+req.method+" Request to "+req.url);
+ addToLogFile( "\nBody:\n"+JSON.stringify(req.body)+ "\n ");
+ 
+    var actProposal = { name:  req.body.artistProposal.artistName
+                      , voteCount :  req.body.artistProposal.numberOfVotes
                       };
 	console.log('actproposal : '+JSON.stringify(actProposal));
 
 					  // create a JavaScript proxy-client for the WebService at the specified URL (in ICS)				  
-	 var urlWSDL = 'https://pcs-gse00000225.process.us2.oraclecloud.com:443/soa-infra/services/default/TakeThree!1*soa_8a16e235-9036-4d22-bc36-f5a32c2b496e/KickOffApproval.service?wsdl';
+	 var urlWSDL = 'https://pcs-gse00000225.process.us2.oraclecloud.com/soa-infra/services/default/ArtistProposalProcess!1.0*soa_68f55698-0293-4386-b2f6-aa6ee69b497f/SubmitActProposal.service?WSDL';
     soap.createClient(urlWSDL, function(err, client) {		
 	  // this setting is required for ICS
 	  client.setSecurity(new soap.WSSecurity(pcsUsername, pcsPassword))
       client.start
       ( actProposal
 	  , function(err, result, raw, soapHeader) {      
-            addToLogFile( "\n => Soap Response for Submit Response Body :\n"+raw+ "\n ");
-			res.writeHead(200, {'Content-Type': 'text/xml'});
-            res.end(raw);
+			res.writeHead(200, {'Content-Type': 'application/json'});
+			var response = {"artistProposalSubmissionResult" : { "status" : "OK, I guess for "+ actProposal.name}};
+            res.end(JSON.stringify(response));
         }// callback on response from SOAP WebService
-      );
+      );//clientStart
     }
     );//createClient
-   }// if 	start
-   }
    
-});//xml2js
-
-} //handlePCSPost
+} //handlePCSRestPost
  
+
 /* make a SOAP call to PCS based on a REST request and return a REST response, no matter how meaningless*/
-function handlePCSRestPost(req, res) {
+function handlePCSRestPosthandlePCSRestPostTakeThree(req, res) {
  var targetServer = "pcs-gse00000225.process.us2.oraclecloud.com";
   /*https://pcs-gse00000225.process.us2.oraclecloud.com:443/soa-infra/services/default/TakeThree!1*soa_8a16e235-9036-4d22-bc36-f5a32c2b496e/KickOffApproval.service?wsdl
   */
@@ -307,8 +380,8 @@ function handlePCSRestPost(req, res) {
     }
     );//createClient
    
-} //handlePCSRestPost
- 
+} //handlePCSRestPostTakeThree
+  
  
 function getValue(property, prefix, obj) {
 console.log('extract property '+ property+' - prfefix '+' - obj '+JSON.stringify(obj) );
