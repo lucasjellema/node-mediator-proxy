@@ -40,8 +40,8 @@ https.get('https://mockdataapi-lucasjellema.apaas.em2.oraclecloud.com/department
   console.error('HTTPS error '+e);
 });
 */
-//var PORT =80;
-var PORT =5100;
+var PORT =80;
+//var PORT =5100;
 
 var proxyServerIP = "104.155.85.98";
 
