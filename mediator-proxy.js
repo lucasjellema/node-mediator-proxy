@@ -40,8 +40,8 @@ https.get('https://mockdataapi-lucasjellema.apaas.em2.oraclecloud.com/department
   console.error('HTTPS error '+e);
 });
 */
-var PORT =80;
-//var PORT =5100;
+//var PORT =80;
+var PORT =5100;
 
 var proxyServerIP = "104.155.85.98";
 
@@ -443,7 +443,7 @@ function handleICSPost(req, res) {
     var actProposal = { artistName: getValue('artistName', acedPrefix, request[0]) 
                       , numberOfVotes :  getValue('numberOfVotes', acedPrefix, request[0])
                       , description: getValue('description', acedPrefix, request[0]) 
-                      ,imageURL : getValue('imageUrl', acedPrefix, request[0])
+                      ,imageURL : getValue('imageURL', acedPrefix, request[0])
                       };
 	// create a JavaScript proxy-client for the WebService at the specified URL (in ICS)				  
 	 var url = 'https://icsdem0058service-icsdem0058.integration.us2.oraclecloud.com:443/integration/flowsvc/soap/PROPOSENEWACTFOR_SOAP/v01/?wsdl';
@@ -588,7 +588,7 @@ http://stackoverflow.com/questions/10435407/proxy-with-express-js
   /* http://140.86.4.95:80/soa-infra/services/aced-cloud-demo/ProposedActsService/ProposedActsService?wsdl */
  var targetPath = req.url.substring(6);
  var targetPort=8080;
- console.log('forward host and port  '+targetServer+":"+targetPort);
+ console.log('SOACS POST forward host and port  '+targetServer+":"+targetPort);
  var targetUrl = "http://"+targetServer+":"+targetPort+targetPath;
  console.log('forward path '+targetUrl);
  var route_request = request.post({uri: targetUrl, json: req.body});
