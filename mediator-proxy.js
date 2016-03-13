@@ -222,7 +222,7 @@ function handlePCSPost(req, res) {
     addToLogFile( "\n JSON Result of parsing HTTP BODY:\n"+JSON.stringify(result)+ "\n ");
 
 	var soapNSPrefix = searchKeyWithValue( result, "http://schemas.xmlsoap.org/soap/envelope/" ).substring(6);
-	console.log('soapNSPrefix'+soapNSPrefix);
+	console.log('PCS POST soapNSPrefix'+soapNSPrefix);
 	var body = result[soapNSPrefix+':Envelope'][soapNSPrefix+':Body'];
     addToLogFile( "\nSoap Body :\n"+JSON.stringify(body)+ "\n ");
 	console.log("body part 0 "+JSON.stringify(body[0]));
@@ -245,11 +245,12 @@ function handlePCSPost(req, res) {
 	  if (body[0][acedPrefix+'start']) {
    	    var r = body[0][acedPrefix+'start'];	
 	    console.log('r : '+JSON.stringify(r));
-	  
-        var actProposal = { name:  r[0]['name']
+	    var artistName = r[0]['name']+"";
+		artistName = artistName.replace(/_/g," ");
+        var actProposal = { name:  artistName
                       , voteCount :  r[0]['voteCount']
                       };
-	    console.log('actproposal : '+JSON.stringify(actProposal));
+	    console.log('actproposal after _ replace : '+JSON.stringify(actProposal));
 
 	    // create a JavaScript proxy-client for the WebService at the specified URL (in PCS)				  
 	    var urlWSDL = 'https://pcs-gse00000225.process.us2.oraclecloud.com:443/soa-infra/services/default/TakeThree!1*soa_8a16e235-9036-4d22-bc36-f5a32c2b496e/KickOffApproval.service?wsdl';
@@ -289,10 +290,12 @@ function handlePCSPost(req, res) {
    	    var r = body[0][acedPrefix+'start'];	
 	    console.log('r : '+JSON.stringify(r));
 	  
-        var actProposal = { name:  r[0]['name']
+	    var artistName = r[0]['name']+"";
+		artistName = artistName.replace(/_/g," ");
+        var actProposal = { name:  artistName
                       , voteCount :  r[0]['voteCount']
                       };
-	    console.log('actproposal : '+JSON.stringify(actProposal));
+	    console.log('actproposal after _ replacement : '+JSON.stringify(actProposal));
 
 	    // create a JavaScript proxy-client for the WebService at the specified URL (in PCS)				  
 	    var urlWSDL = 'https://pcs-gse00000225.process.us2.oraclecloud.com/soa-infra/services/default/ArtistProposalProcess!1.0*soa_68f55698-0293-4386-b2f6-aa6ee69b497f/SubmitActProposal.service?WSDL';
@@ -325,8 +328,11 @@ function handlePCSRestPost(req, res) {
 
  addToLogFile( "\n["+dateFormat(new Date(), "dddd, mmmm dS, yyyy, h:MM:ss TT")+"] Handle PCS REST POST and turn into one way SOAP Call"+req.method+" Request to "+req.url);
  addToLogFile( "\nBody:\n"+JSON.stringify(req.body)+ "\n ");
+
+	    var artistName = req.body.artistProposal.artistName+"";
+		artistName = artistName.replace(/_/g," ");
  
-    var actProposal = { name:  req.body.artistProposal.artistName
+    var actProposal = { name:  artistName
                       , voteCount :  req.body.artistProposal.numberOfVotes
                       };
 	console.log('actproposal : '+JSON.stringify(actProposal));
@@ -361,10 +367,10 @@ function handlePCSRestPosthandlePCSRestPostTakeThree(req, res) {
  addToLogFile( "\n["+dateFormat(new Date(), "dddd, mmmm dS, yyyy, h:MM:ss TT")+"] Handle PCS REST POST and turn into one way SOAP Call"+req.method+" Request to "+req.url);
  addToLogFile( "\nBody:\n"+JSON.stringify(req.body)+ "\n ");
  
-    var actProposal = { name:  req.body.artistProposal.artistName
+    var actProposal = { name:  req.body.artistProposal.artistName.replace(/_/g," ")
                       , voteCount :  req.body.artistProposal.numberOfVotes
                       };
-	console.log('actproposal : '+JSON.stringify(actProposal));
+	console.log('handlePCSRestPosthandlePCSRestPostTakeThree:  actproposal : '+JSON.stringify(actProposal));
 
 					  // create a JavaScript proxy-client for the WebService at the specified URL (in ICS)				  
 	 var urlWSDL = 'https://pcs-gse00000225.process.us2.oraclecloud.com:443/soa-infra/services/default/TakeThree!1*soa_8a16e235-9036-4d22-bc36-f5a32c2b496e/KickOffApproval.service?wsdl';
