@@ -115,6 +115,8 @@ app.get('/ics/*', function(req,res){ handleICS(req, res);} );
 app.get('/pcs/*', function(req,res){ handlePCSGet(req, res);} );
 app.post('/pcs/*', function(req,res){ handlePCSPost(req, res);} );
 
+app.all('/mcs/*', function(req,res){ handleMCS(req, res);} );
+
 //app.get('/artists/*', function(req,res){ handleArtists(req, res);} );
 app.get('/artists/*', function(req,res){ handleArtistsAPI(req, res);} );
 
@@ -579,6 +581,28 @@ else {
 } 
  } //handleICS
 
+/* deal with all requests to MCS */
+function handleMCS(req, res) {
+/*
+http://stackoverflow.com/questions/10435407/proxy-with-express-js
+
+https://mobileportalsetrial1304dev-mcsdem0001.mobileenv.us2.oraclecloud.com:443/mobile/custom/artistapi
+*/
+
+
+ var targetServer = "mobileportalsetrial1304dev-mcsdem0001.mobileenv.us2.oraclecloud.com";
+ var targetPath = req.url.substring(4);// chop off the mcs/
+ var targetPort=443;
+ console.log('MCS  forward host and port  '+targetServer+":"+targetPort);
+ var targetUrl = "https://"+targetServer+":"+targetPort+targetPath;
+ console.log('forward path '+targetUrl);
+
+ 
+  req.pipe(request(targetUrl)).pipe(res);
+ 
+ } //handleMCS
+ 
+ 
 /* deal with SOAP calls to SOACS */
 function handleSOACSPost(req, res) {
 /*
