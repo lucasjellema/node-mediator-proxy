@@ -794,7 +794,8 @@ function handleArtists(req, res) {
   var spotifyAPI ='https://api.spotify.com/v1';
   var url_parts = url.parse(req.url, true);
   var query = url_parts.query;
-  
+  addToLogFile( "\n["+dateFormat(new Date(), "dddd, mmmm dS, yyyy, h:MM:ss TT")+"] Handle Artist Enrichment request for '+ query.artist+' directly to spotify , forwarded to "+spotifyAPI + '/search?q='+encodeURI(query.artist)+'&type=artist');
+ 
   request(spotifyAPI + '/search?q='+encodeURI(query.artist)+'&type=artist', function (error, response, body) {  
     if (!error && response.statusCode == 200) {
       var artistsResponse = JSON.parse(body);
