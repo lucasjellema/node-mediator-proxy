@@ -117,7 +117,7 @@ app.post('/pcs/*', function(req,res){ handlePCSPost(req, res);} );
 
 app.all('/mcs/*', function(req,res){ handleMCS(req, res);} );
 
-//app.get('/artists/*', function(req,res){ handleArtists(req, res);} );
+app.get('/artistes/*', function(req,res){ handleArtists(req, res);} );
 app.get('/artists/*', function(req,res){ handleArtistsAPI(req, res);} );
 
 
@@ -143,6 +143,7 @@ function handleArtistsAPI(req, res) {
  var targetPort=443;
  var targetUrl = "https://"+targetServer+":"+targetPort+targetPath;
  console.log('forward path '+targetUrl);
+ addToLogFile( "\n["+dateFormat(new Date(), "dddd, mmmm dS, yyyy, h:MM:ss TT")+"] Handle Artist Enrichment reuqest, forwarded to "+targetUrl);
 
  var route_options ={};
  route_options.method = req.method;
@@ -602,6 +603,7 @@ https://mobileportalsetrial1304dev-mcsdem0001.mobileenv.us2.oraclecloud.com:443/
  console.log('MCS  forward host and port  '+targetServer+":"+targetPort);
  var targetUrl = "https://"+targetServer+":"+targetPort+targetPath;
  console.log('forward path '+targetUrl);
+ addToLogFile( "\n["+dateFormat(new Date(), "dddd, mmmm dS, yyyy, h:MM:ss TT")+"] Handle MCS request, forwarded to "+targetUrl);
 
  
   req.pipe(request(targetUrl)).pipe(res);
@@ -620,6 +622,9 @@ http://stackoverflow.com/questions/10435407/proxy-with-express-js
  var targetPort=8080;
  console.log('SOACS POST forward host and port  '+targetServer+":"+targetPort);
  var targetUrl = "http://"+targetServer+":"+targetPort+targetPath;
+
+ addToLogFile( "\n["+dateFormat(new Date(), "dddd, mmmm dS, yyyy, h:MM:ss TT")+"] Handle SOA CS request, forwarded to "+targetUrl);
+
  console.log('forward path '+targetUrl);
  var route_request = request.post({uri: targetUrl, json: req.body});
  req.pipe(route_request).pipe(res);
@@ -648,6 +653,8 @@ console.log("request path="+request.path);
 var url_parts = url.parse(request.url, true);
 var query = url_parts.query;
 console.log("query:"+query);
+ addToLogFile( "\n["+dateFormat(new Date(), "dddd, mmmm dS, yyyy, h:MM:ss TT")+"] Handle SOA CS request, forwarded to "
+ +optionsSOACS.targetServer+":"+optionsSOACS.port+optionsSOACS.path);
 
   console.log('forward host and port  '+optionsSOACS.targetServer+":"+optionsSOACS.port);
   console.log('forward path '+optionsSOACS.path);
