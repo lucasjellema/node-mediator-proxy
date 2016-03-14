@@ -118,7 +118,8 @@ app.post('/pcs/*', function(req,res){ handlePCSPost(req, res);} );
 app.all('/mcs/*', function(req,res){ handleMCS(req, res);} );
 
 app.get('/artistes/*', function(req,res){ handleArtists(req, res);} );
-app.get('/artists/*', function(req,res){ handleArtistsAPI(req, res);} );
+app.get('/artists/*', function(req,res){ handleArtists(req, res);} );
+// what it is supposed to be app.get('/artists/*', function(req,res){ handleArtistsAPI(req, res);} );
 
 
 function searchKeyWithValue( obj, value ){
