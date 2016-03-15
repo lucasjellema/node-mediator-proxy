@@ -1,4 +1,11 @@
+//CORS middleware - taken from http://stackoverflow.com/questions/7067966/how-to-allow-cors-in-express-node-js
+var allowCrossDomain = function(req, res, next) {
+    res.header('Access-Control-Allow-Origin', 'example.com');
+    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+    res.header('Access-Control-Allow-Headers', 'Content-Type');
 
+    next();
+}
 
 var https = require('https'),
     http = require('http'),
@@ -42,7 +49,7 @@ https.get('https://mockdataapi-lucasjellema.apaas.em2.oraclecloud.com/department
 */
 var PORT =80;
 //var PORT =5100;
-var proxyVersion = "0.9.1"
+var proxyVersion = "0.9.2"
 
 var proxyServerIP = "104.155.85.98";
 
@@ -64,6 +71,9 @@ app.listen(PORT, function () {
   console.log('Server running, Express is listening on port ...'+PORT);
 });
 */
+
+
+
 
 if (module === require.main) {
   // [START server]
@@ -117,7 +127,8 @@ app.post('/soacs/*', function(req,res){ handleSOACSPost(req, res);} );
 app.use(bodyParser.json()); // for parsing application/json
 //app.use(bodyParser.urlencoded({ extended: false })); 
 // parse an HTML body into a string 
-app.use(bodyParser.text({ type: 'text/xml' }))
+app.use(bodyParser.text({ type: 'text/xml' }));
+app.use(allowCrossDomain);
 app.post('/ics/*', function(req,res){ handleICSPost(req, res);} );
 app.get('/ics/*', function(req,res){ handleICS(req, res);} );
 app.get('/pcs/*', function(req,res){ handlePCSGet(req, res);} );
@@ -609,7 +620,33 @@ https://mobileportalsetrial1304dev-mcsdem0001.mobileenv.us2.oraclecloud.com:443/
  addToLogFile( "\n["+dateFormat(new Date(), "dddd, mmmm dS, yyyy, h:MM:ss TT")+"] Handle MCS request, forwarded to "+targetUrl);
 
  
-  req.pipe(request(targetUrl)).pipe(res);
+ // before it was just:
+ 
+ 
+ 
+   req.pipe(request(targetUrl)).pipe(res);
+ 
+ // now I have brought CORS support into the picture:
+ /*
+  var data="";
+  var rq = req.pipe(request(targetUrl));
+    rq.on('data', function(d) {
+    console.log("on receive data");
+    process.stdout.write(d);
+	data=data+d;
+    console.log("data = "+data);
+  });//data
+
+  rq.on('end', function() {
+    console.log("end receive data");
+    console.log('data = '+ data);
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
+    res.setHeader('Access-Control-Allow-Credentials', true);
+    res.end(data);
+  });//on end
+  */
  
  } //handleMCS
  
