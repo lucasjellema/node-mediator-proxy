@@ -45,6 +45,10 @@ var PORT =80;
 
 var proxyServerIP = "104.155.85.98";
 
+var icsUsername= 'gse_cloud-admin@oracleads.com';
+var icsPassword = 'bristlyYear_5';
+
+
 var options = {
   host: targetServer,
   port: 443,
@@ -67,7 +71,10 @@ if (module === require.main) {
     var host = server.address().address;
 
     console.log('App listening at http://%s:%s', host, PORT);
-  });
+    addToLogFile( "\n["+dateFormat(new Date(), "dddd, mmmm dS, yyyy, h:MM:ss TT")+"] **************************************** Restart ");
+    addToLogFile( "\n ********* Restart of proxy; listeneing at  "+host+":" + port );
+
+	});
   // [END server]
 }
 
@@ -410,8 +417,6 @@ function handleICSPost(req, res) {
    handleICS(req, res);
  } else 
  {
- var icsUsername= 'gse_cloud-admin@oracleads.com';
- var icsPassword = 'bristlyYear5^';
 
  addToLogFile( "\n["+dateFormat(new Date(), "dddd, mmmm dS, yyyy, h:MM:ss TT")+"] Handle ICS POST "+req.method+" Request to "+req.url);
  addToLogFile( "\nBody:\n"+req.body+ "\n ");
@@ -526,8 +531,6 @@ function handleICSPost(req, res) {
 
 /* deal with (REST and SOAP) calls to ICS */
 function handleICS(req, res) {
- var icsUsername= 'gse_cloud-admin@oracleads.com';
- var icsPassword = 'bristlyYear5^';
 
 
 /*
@@ -545,8 +548,6 @@ http://stackoverflow.com/questions/10435407/proxy-with-express-js
  var targetPath = req.url.substring(4); // anything after /ics
  var targetPort=443;
  // credentials for ICS
- var icsUsername= 'gse_cloud-admin@oracleads.com';
- var icsPassword = 'bristlyYear5^';
 console.log('ICS request '+ req.method);
  var targetUrl = "https://"+targetServer+":"+targetPort+targetPath;
  console.log('forward path '+targetUrl);
@@ -733,8 +734,8 @@ var targetPath = "/integration/flowapi/rest/DISTANCECONVERSIONRESTUSINGEXTER/v01
 local:
 http://localhost:5100/conversion/distance/Meters/Yards?distance=100
 */
-var username= 'gse_cloud-admin@oracleads.com';
-var passw = 'bristlyYear5^';
+var username= icsUsername;
+var passw = icsPassword;
 var optionsC = {
   host: targetServer,
   port: 443,
