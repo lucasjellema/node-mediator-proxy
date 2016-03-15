@@ -72,7 +72,7 @@ if (module === require.main) {
 
     console.log('App listening at http://%s:%s', host, PORT);
     addToLogFile( "\n["+dateFormat(new Date(), "dddd, mmmm dS, yyyy, h:MM:ss TT")+"] **************************************** Restart ");
-    addToLogFile( "\n ********* Restart of proxy; listeneing at  "+host+":" + port );
+    addToLogFile( "\n ********* Restart of proxy; listeneing at  "+host+":" + PORT );
 
 	});
   // [END server]
