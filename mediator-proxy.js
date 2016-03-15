@@ -42,6 +42,7 @@ https.get('https://mockdataapi-lucasjellema.apaas.em2.oraclecloud.com/department
 */
 var PORT =80;
 //var PORT =5100;
+var proxyVersion = "0.9.1"
 
 var proxyServerIP = "104.155.85.98";
 
@@ -72,7 +73,7 @@ if (module === require.main) {
 
     console.log('App listening at http://%s:%s', host, PORT);
     addToLogFile( "\n["+dateFormat(new Date(), "dddd, mmmm dS, yyyy, h:MM:ss TT")+"] **************************************** Restart ");
-    addToLogFile( "\n ********* Restart of proxy; listeneing at  "+host+":" + PORT );
+    addToLogFile( "\n ********* Restart of proxy; version "+proxyVersion + ", listening at  port "+":" + PORT );
 
 	});
   // [END server]
