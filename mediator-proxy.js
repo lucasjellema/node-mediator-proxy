@@ -55,7 +55,7 @@ var proxyVersion = "0.9.2"
 var proxyServerIP = "104.155.85.98";
 
 var icsUsername= 'gse_cloud-admin@oracleads.com';
-var icsPassword = 'bristlyYear_5';
+var icsPassword = 'stonySpoiler+8';
 
 
 var options = {
