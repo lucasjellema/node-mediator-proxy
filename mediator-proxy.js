@@ -20,6 +20,7 @@ var https = require('https'),
 
 var soap = require('soap'); //https://www.npmjs.com/package/soap
 var xml2js = require('xml2js'); //https://www.npmjs.com/package/xml2js
+
 /* docs:
 https://nodejs.org/api/https.html
 https://nodejs.org/api/http.html
@@ -30,6 +31,13 @@ https://github.com/request/request
 	
 var express = require('express');
 var app = express();
+
+
+var icsUsername= 'gse_cloud-admin@oracleads.com';
+var icsPassword = 'bIndinG@4UiguR';
+ var pcsUsername= 'cloud.admin';
+ var pcsPassword = 'blunt@2DenIaL';
+
 
 var logFile = 'mediator-proxy.txt';
 var targetServer = "mockdataapi-lucasjellema.apaas.em2.oraclecloud.com";
@@ -54,8 +62,6 @@ var proxyVersion = "0.9.2"
 
 var proxyServerIP = "104.155.85.98";
 
-var icsUsername= 'gse_cloud-admin@oracleads.com';
-var icsPassword = 'stonySpoiler+8';
 
 
 var options = {
@@ -232,8 +238,6 @@ function handlePCSPost(req, res) {
  var targetServer = "pcs-gse00000225.process.us2.oraclecloud.com";
   /*https://pcs-gse00000225.process.us2.oraclecloud.com:443/soa-infra/services/default/TakeThree!1*soa_8a16e235-9036-4d22-bc36-f5a32c2b496e/KickOffApproval.service?wsdl
   */
- var pcsUsername= 'cloud.admin';
- var pcsPassword = 'gLvHRTttU_7A';
 
  addToLogFile( "\n["+dateFormat(new Date(), "dddd, mmmm dS, yyyy, h:MM:ss TT")+"] Handle PCS POST "+req.method+" Request to "+req.url);
  addToLogFile( "\nBody:\n"+req.body+ "\n ");
@@ -345,8 +349,6 @@ function handlePCSPost(req, res) {
 /* make a SOAP call to PCS based on a REST request and return a REST response, no matter how meaningless*/
 function handlePCSRestPost(req, res) {
  var targetServer = "pcs-gse00000225.process.us2.oraclecloud.com";
- var pcsUsername= 'cloud.admin';
- var pcsPassword = 'gLvHRTttU_7A';
 
  addToLogFile( "\n["+dateFormat(new Date(), "dddd, mmmm dS, yyyy, h:MM:ss TT")+"] Handle PCS REST POST and turn into one way SOAP Call"+req.method+" Request to "+req.url);
  addToLogFile( "\nBody:\n"+JSON.stringify(req.body)+ "\n ");
@@ -383,8 +385,6 @@ function handlePCSRestPosthandlePCSRestPostTakeThree(req, res) {
  var targetServer = "pcs-gse00000225.process.us2.oraclecloud.com";
   /*https://pcs-gse00000225.process.us2.oraclecloud.com:443/soa-infra/services/default/TakeThree!1*soa_8a16e235-9036-4d22-bc36-f5a32c2b496e/KickOffApproval.service?wsdl
   */
- var pcsUsername= 'cloud.admin';
- var pcsPassword = 'gLvHRTttU_7A';
 
  addToLogFile( "\n["+dateFormat(new Date(), "dddd, mmmm dS, yyyy, h:MM:ss TT")+"] Handle PCS REST POST and turn into one way SOAP Call"+req.method+" Request to "+req.url);
  addToLogFile( "\nBody:\n"+JSON.stringify(req.body)+ "\n ");
@@ -773,8 +773,6 @@ var targetPath = "/integration/flowapi/rest/DISTANCECONVERSIONRESTUSINGEXTER/v01
 local:
 http://localhost:5100/conversion/distance/Meters/Yards?distance=100
 */
-var username= icsUsername;
-var passw = icsPassword;
 var optionsC = {
   host: targetServer,
   port: 443,
