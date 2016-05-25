@@ -39,6 +39,9 @@ var icsPassword = 'bIndinG@4UiguR';
  var pcsPassword = 'blunt@2DenIaL';
 
 
+ var icsTargetServer = "icsdem0058service-icsdem0058.integration.us2.oraclecloud.com";
+
+
 var logFile = 'mediator-proxy.txt';
 var targetServer = "mockdataapi-lucasjellema.apaas.em2.oraclecloud.com";
 //var targetServer = "data-api-lucasjellema.apaas.em2.oraclecloud.com"
@@ -363,8 +366,15 @@ function handlePCSRestPost(req, res) {
 
 					  // create a JavaScript proxy-client for the WebService at the specified URL (in ICS)				  
 	 var urlWSDL = 'https://pcs-gse00000225.process.us2.oraclecloud.com/soa-infra/services/default/ArtistProposalProcess!1.0*soa_68f55698-0293-4386-b2f6-aa6ee69b497f/SubmitActProposal.service?WSDL';
+ 
+ 
     soap.createClient(urlWSDL, function(err, client) {		
-	  // this setting is required for ICS
+	  if (err) {
+         addToLogFile("Error in handling PCS call "+JSON.stringify(err)); 
+      } else {
+          
+       try {   
+      // this setting is required for ICS
 	  client.setSecurity(new soap.WSSecurity(pcsUsername, pcsPassword))
       client.start
       ( actProposal
@@ -374,6 +384,11 @@ function handlePCSRestPost(req, res) {
             res.end(JSON.stringify(response));
         }// callback on response from SOAP WebService
       );//clientStart
+      }
+      catch(err) {
+         addToLogFile("Error in handling PCS call "+JSON.stringify(err));     
+      } 
+      }
     }
     );//createClient
    
@@ -397,6 +412,11 @@ function handlePCSRestPosthandlePCSRestPostTakeThree(req, res) {
 					  // create a JavaScript proxy-client for the WebService at the specified URL (in ICS)				  
 	 var urlWSDL = 'https://pcs-gse00000225.process.us2.oraclecloud.com:443/soa-infra/services/default/TakeThree!1*soa_8a16e235-9036-4d22-bc36-f5a32c2b496e/KickOffApproval.service?wsdl';
     soap.createClient(urlWSDL, function(err, client) {		
+	  if (err) {
+         addToLogFile("Error in handling PCS call "+JSON.stringify(err)); 
+      } else {
+          
+       try {   
 	  // this setting is required for ICS
 	  client.setSecurity(new soap.WSSecurity(pcsUsername, pcsPassword))
       client.start
@@ -407,8 +427,14 @@ function handlePCSRestPosthandlePCSRestPostTakeThree(req, res) {
             res.end(JSON.stringify(response));
         }// callback on response from SOAP WebService
       );//clientStart
+      }
+      catch(err) {
+         addToLogFile("Error in handling PCS call "+JSON.stringify(err));     
+      } 
+
     }
-    );//createClient
+      }
+          );//createClient
    
 } //handlePCSRestPostTakeThree
   
@@ -474,7 +500,7 @@ function handleICSPost(req, res) {
                       ,imageURL : getValue('imageURL', acedPrefix, request[0])
                       };
 	// create a JavaScript proxy-client for the WebService at the specified URL (in ICS)				  
-	 var url = 'https://icsdem0058service-icsdem0058.integration.us2.oraclecloud.com:443/integration/flowsvc/soap/PROPOSENEWACTFOR_SOAP/v01/?wsdl';
+	 var url = 'https://'+ icsTargetServer+':443/integration/flowsvc/soap/PROPOSENEWACTFOR_SOAP/v01/?wsdl';
     soap.createClient(url, function(err, client) {		
 	  // this setting is required for ICS
 	  client.setSecurity(new soap.WSSecurity(icsUsername, icsPassword))
@@ -517,7 +543,7 @@ function handleICSPost(req, res) {
                       };
     addToLogFile( "\n => Go invoke ICS - Verify Existence - with  :\n"+JSON.stringify(verifyAct)+ "\n ");
 
-	var url = 'https://icsdem0058service-icsdem0058.integration.us2.oraclecloud.com/integration/flowsvc/soap/VERIFYEXISTENCEO_FROMSOACS/v01/?wsdl';
+	var url ='https://'+ icsTargetServer+'/integration/flowsvc/soap/VERIFYEXISTENCEO_FROMSOACS/v01/?wsdl';
 
 					  // create a JavaScript proxy-client for the WebService at the specified URL (in ICS)				  
     soap.createClient(url, function(err, client) {		
@@ -774,7 +800,7 @@ local:
 http://localhost:5100/conversion/distance/Meters/Yards?distance=100
 */
 var optionsC = {
-  host: targetServer,
+  host: icsTargetServer,
   port: 443,
 headers: {
     accept: '*/*',
