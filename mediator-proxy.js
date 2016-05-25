@@ -284,6 +284,10 @@ function handlePCSPost(req, res) {
 	    // create a JavaScript proxy-client for the WebService at the specified URL (in PCS)				  
 	    var urlWSDL = 'https://pcs-gse00000225.process.us2.oraclecloud.com:443/soa-infra/services/default/TakeThree!1*soa_8a16e235-9036-4d22-bc36-f5a32c2b496e/KickOffApproval.service?wsdl';
         soap.createClient(urlWSDL, function(err, client) {		
+	  if (err) {
+         addToLogFile("Error in handling PCS call "+JSON.stringify(err)); 
+      } else {
+       try {   
 	    // this setting is required for PCS
   	    client.setSecurity(new soap.WSSecurity(pcsUsername, pcsPassword))
         client.start
@@ -295,6 +299,11 @@ function handlePCSPost(req, res) {
           }// callback on response from SOAP WebService
         );
       }
+      catch(err) {
+         addToLogFile("Error in handling PCS call "+JSON.stringify(err));     
+      }// catch 
+      }// try
+      } //else
       );//createClient
      }// if 	start
    }// if TakeThree namespace 
@@ -329,6 +338,11 @@ function handlePCSPost(req, res) {
 	    // create a JavaScript proxy-client for the WebService at the specified URL (in PCS)				  
 	    var urlWSDL = 'https://pcs-gse00000225.process.us2.oraclecloud.com/soa-infra/services/default/ArtistProposalProcess!1.0*soa_68f55698-0293-4386-b2f6-aa6ee69b497f/SubmitActProposal.service?WSDL';
         soap.createClient(urlWSDL, function(err, client) {		
+	  if (err) {
+         addToLogFile("Error in handling PCS call "+JSON.stringify(err)); 
+      } else {
+          
+       try {   
 	    // this setting is required for PCS
   	    client.setSecurity(new soap.WSSecurity(pcsUsername, pcsPassword))
         client.start
@@ -340,6 +354,11 @@ function handlePCSPost(req, res) {
           }// callback on response from SOAP WebService
         );
       }
+      catch(err) {
+         addToLogFile("Error in handling PCS call "+JSON.stringify(err));     
+      }// catch 
+      }// try
+      } //else
       );//createClient
      }// if 	start
    }// if ArtistProposalProcess/SubmitActProposal namespace  
@@ -387,9 +406,9 @@ function handlePCSRestPost(req, res) {
       }
       catch(err) {
          addToLogFile("Error in handling PCS call "+JSON.stringify(err));     
-      } 
-      }
-    }
+      }// catch 
+      }// try
+      } //else
     );//createClient
    
 } //handlePCSRestPost
@@ -588,11 +607,13 @@ http://stackoverflow.com/questions/10435407/proxy-with-express-js
  var targetPort=443;
  // credentials for ICS
 console.log('ICS request '+ req.method);
- var targetUrl = "https://"+targetServer+":"+targetPort+targetPath;
+ var targetUrl = "https://"+icsTargetServer+":"+targetPort+targetPath;
  console.log('forward path '+targetUrl);
 
- addToLogFile( "\n["+dateFormat(new Date(), "dddd, mmmm dS, yyyy, h:MM:ss TT")+"] Handle ICS REST "+req.method+" Request to "+targetUrl);
+ addToLogFile( "\n["+dateFormat(new Date(), "dddd, mmmm dS, yyyy, h:MM:ss TT")+"] (function handleICS) Handle ICS REST "+req.method+" Request to "+targetUrl);
  addToLogFile( "\nBody:\n"+JSON.stringify(req.body)+ "\n ");
+ addToLogFile( "\nBody could be manipulated - :\n"+JSON.stringify(req.body).indexOf("data_artistname_2")+ "\n ");
+ 
  
  var route_options ={};
  var url_parts = url.parse(req.url, true);
