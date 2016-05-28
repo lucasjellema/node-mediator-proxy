@@ -145,6 +145,7 @@ app.get('/pcs/*', function(req,res){ handlePCSGet(req, res);} );
 app.post('/pcs/*', function(req,res){ handlePCSPost(req, res);} );
 
 app.all('/mcs/*', function(req,res){ handleMCS(req, res);} );
+app.all('/c3/*', function(req,res){ handleC3(req, res);} );
 
 app.get('/artistes/*', function(req,res){ handleArtists(req, res);} );
 app.get('/artists/*', function(req,res){ handleArtists(req, res);} );
@@ -649,6 +650,21 @@ else {
   req.pipe(route_request).pipe(res);
 } 
  } //handleICS
+
+
+function handleC3(req, res) {
+//https://c3-api-lucasjellema.apaas.em2.oraclecloud.com/speakers
+ var targetServer = "c3-api-lucasjellema.apaas.em2.oraclecloud.com";
+ var targetPath = req.url.substring(3);// chop off the mcs/
+ var targetPort=443;
+ console.log('C3 API  forward host and port  '+targetServer+":"+targetPort);
+ var targetUrl = "https://"+targetServer+":"+targetPort+targetPath;
+ console.log('forward path '+targetUrl);
+ addToLogFile( "\n["+dateFormat(new Date(), "dddd, mmmm dS, yyyy, h:MM:ss TT")+"] Handle C3 request, forwarded to "+targetUrl);
+
+   req.pipe(request(targetUrl)).pipe(res);
+ } //handleC3
+
 
 /* deal with all requests to MCS */
 function handleMCS(req, res) {
