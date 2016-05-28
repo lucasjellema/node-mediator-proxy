@@ -34,12 +34,13 @@ var app = express();
 
 
 var icsUsername= 'gse_cloud-admin@oracleads.com';
-var icsPassword = 'bIndinG@4UiguR';
+var icsPassword = 'blOody@4PiLl';
  var pcsUsername= 'cloud.admin';
- var pcsPassword = 'blunt@2DenIaL';
+ var pcsPassword = 'preservedPoundage=4';
 
 
  var icsTargetServer = "icsdem0058service-icsdem0058.integration.us2.oraclecloud.com";
+ var pcsTargetServer = "pcs1-gse00000196.process.us2.oraclecloud.com"; // identity domain gse00000196 
  var soacsTargetServer = "140.86.4.95";
 
 
@@ -190,12 +191,11 @@ function handleArtistsAPI(req, res) {
 /* deal with (WSDL get requests to PCS */
 function handlePCSGet(req, res) {
 
- var targetServer = "pcs-gse00000225.process.us2.oraclecloud.com";
  var targetPath = req.url.substring(4); // anything after /pcs
  var targetPort=443;
 
  console.log('PCS request '+ req.method);
- var targetUrl = "https://"+targetServer+":"+targetPort+targetPath;
+ var targetUrl = "https://"+pcsTargetServer+":"+targetPort+targetPath;
  console.log('forward path '+targetUrl);
 
  addToLogFile( "\n["+dateFormat(new Date(), "dddd, mmmm dS, yyyy, h:MM:ss TT")+"] Handle PCS REST "+req.method+" Request to "+targetUrl);
@@ -214,17 +214,11 @@ function handlePCSGet(req, res) {
  route_options.method = req.method;
  route_options.uri = targetUrl;
  route_options.json = req.body;
-/* route_options.auth = {
-                        'user': icsUsername,
-                        'pass': icsPassword,
-                        'sendImmediately': false
-                      };
-*/
   if (isWsdlRequest) {
     request(route_options, function (error, response, body) {
     if (!error && response.statusCode == 200) {
 	  // replace all endpoint references in WSDL document to ICS with references to proxy:
-      var data = body.replace(/https\:\/\/pcs\-gse00000225\.process.us2\.oraclecloud\.com\:443/g,"http://"+proxyServerIP+"/pcs");
+      var data = body.replace(/https\:\/\/pcs1\-gse00000196\.process.us2\.oraclecloud\.com\:443/g,"http://"+proxyServerIP+"/pcs");
       res.writeHead(response.statusCode, response.headers);
       res.end(data);
 	}
@@ -240,9 +234,6 @@ function handlePCSPost(req, res) {
     handlePCSRestPost(req, res);
     return;
   }
- var targetServer = "pcs-gse00000225.process.us2.oraclecloud.com";
-  /*https://pcs-gse00000225.process.us2.oraclecloud.com:443/soa-infra/services/default/TakeThree!1*soa_8a16e235-9036-4d22-bc36-f5a32c2b496e/KickOffApproval.service?wsdl
-  */
 
  addToLogFile( "\n["+dateFormat(new Date(), "dddd, mmmm dS, yyyy, h:MM:ss TT")+"] Handle PCS POST "+req.method+" Request to "+req.url);
  addToLogFile( "\nBody:\n"+req.body+ "\n ");
@@ -284,7 +275,8 @@ function handlePCSPost(req, res) {
 	    console.log('actproposal after _ replace : '+JSON.stringify(actProposal));
 
 	    // create a JavaScript proxy-client for the WebService at the specified URL (in PCS)				  
-	    var urlWSDL = 'https://pcs-gse00000225.process.us2.oraclecloud.com:443/soa-infra/services/default/TakeThree!1*soa_8a16e235-9036-4d22-bc36-f5a32c2b496e/KickOffApproval.service?wsdl';
+	    // TODO replace with endpoint for the PCS process WSDL
+	    var urlWSDL = 'https://'+ pcsTargetServer+ :443/soa-infra/services/default/TakeThree!1*soa_8a16e235-9036-4d22-bc36-f5a32c2b496e/KickOffApproval.service?wsdl';
         soap.createClient(urlWSDL, function(err, client) {		
 	  if (err) {
          addToLogFile("Error in handling PCS call "+JSON.stringify(err)); 
@@ -338,7 +330,8 @@ function handlePCSPost(req, res) {
 	    console.log('actproposal after _ replacement : '+JSON.stringify(actProposal));
 
 	    // create a JavaScript proxy-client for the WebService at the specified URL (in PCS)				  
-	    var urlWSDL = 'https://pcs-gse00000225.process.us2.oraclecloud.com/soa-infra/services/default/ArtistProposalProcess!1.0*soa_68f55698-0293-4386-b2f6-aa6ee69b497f/SubmitActProposal.service?WSDL';
+	    // TODO: replace with proper PCS process instance endpoint
+	    var urlWSDL = 'https://'+ pcsTargetServer+'/soa-infra/services/default/ArtistProposalProcess!1.0*soa_68f55698-0293-4386-b2f6-aa6ee69b497f/SubmitActProposal.service?WSDL';
         soap.createClient(urlWSDL, function(err, client) {		
 	  if (err) {
          addToLogFile("Error in handling PCS call "+JSON.stringify(err)); 
@@ -372,7 +365,6 @@ function handlePCSPost(req, res) {
  
 /* make a SOAP call to PCS based on a REST request and return a REST response, no matter how meaningless*/
 function handlePCSRestPost(req, res) {
- var targetServer = "pcs-gse00000225.process.us2.oraclecloud.com";
 
  addToLogFile( "\n["+dateFormat(new Date(), "dddd, mmmm dS, yyyy, h:MM:ss TT")+"] Handle PCS REST POST and turn into one way SOAP Call"+req.method+" Request to "+req.url);
  addToLogFile( "\nBody:\n"+JSON.stringify(req.body)+ "\n ");
@@ -386,7 +378,7 @@ function handlePCSRestPost(req, res) {
 	console.log('actproposal : '+JSON.stringify(actProposal));
 
 					  // create a JavaScript proxy-client for the WebService at the specified URL (in ICS)				  
-	 var urlWSDL = 'https://pcs-gse00000225.process.us2.oraclecloud.com/soa-infra/services/default/ArtistProposalProcess!1.0*soa_68f55698-0293-4386-b2f6-aa6ee69b497f/SubmitActProposal.service?WSDL';
+	 var urlWSDL = 'https://'+ pcsTargetServer+ '/soa-infra/services/default/ArtistProposalProcess!1.0*soa_68f55698-0293-4386-b2f6-aa6ee69b497f/SubmitActProposal.service?WSDL';
  
  
     soap.createClient(urlWSDL, function(err, client) {		
@@ -418,9 +410,6 @@ function handlePCSRestPost(req, res) {
 
 /* make a SOAP call to PCS based on a REST request and return a REST response, no matter how meaningless*/
 function handlePCSRestPosthandlePCSRestPostTakeThree(req, res) {
- var targetServer = "pcs-gse00000225.process.us2.oraclecloud.com";
-  /*https://pcs-gse00000225.process.us2.oraclecloud.com:443/soa-infra/services/default/TakeThree!1*soa_8a16e235-9036-4d22-bc36-f5a32c2b496e/KickOffApproval.service?wsdl
-  */
 
  addToLogFile( "\n["+dateFormat(new Date(), "dddd, mmmm dS, yyyy, h:MM:ss TT")+"] Handle PCS REST POST and turn into one way SOAP Call"+req.method+" Request to "+req.url);
  addToLogFile( "\nBody:\n"+JSON.stringify(req.body)+ "\n ");
@@ -431,7 +420,7 @@ function handlePCSRestPosthandlePCSRestPostTakeThree(req, res) {
 	console.log('handlePCSRestPosthandlePCSRestPostTakeThree:  actproposal : '+JSON.stringify(actProposal));
 
 					  // create a JavaScript proxy-client for the WebService at the specified URL (in ICS)				  
-	 var urlWSDL = 'https://pcs-gse00000225.process.us2.oraclecloud.com:443/soa-infra/services/default/TakeThree!1*soa_8a16e235-9036-4d22-bc36-f5a32c2b496e/KickOffApproval.service?wsdl';
+	 var urlWSDL = 'https://'+ pcsTargetServer+':443/soa-infra/services/default/TakeThree!1*soa_8a16e235-9036-4d22-bc36-f5a32c2b496e/KickOffApproval.service?wsdl';
     soap.createClient(urlWSDL, function(err, client) {		
 	  if (err) {
          addToLogFile("Error in handling PCS call "+JSON.stringify(err)); 
@@ -596,7 +585,6 @@ function handleICS(req, res) {
 /*
 http://stackoverflow.com/questions/10435407/proxy-with-express-js
 */
- var targetServer = "icsdem0058service-icsdem0058.integration.us2.oraclecloud.com";
   /* 
   https://icsdem0058service-icsdem0058.integration.us2.oraclecloud.com:443/integration/flowsvc/soap/PROPOSENEWACTFOR_SOAP/v01/
   and
