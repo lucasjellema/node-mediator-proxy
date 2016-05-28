@@ -276,7 +276,7 @@ function handlePCSPost(req, res) {
 
 	    // create a JavaScript proxy-client for the WebService at the specified URL (in PCS)				  
 	    // TODO replace with endpoint for the PCS process WSDL
-	    var urlWSDL = 'https://'+ pcsTargetServer+ :443/soa-infra/services/default/TakeThree!1*soa_8a16e235-9036-4d22-bc36-f5a32c2b496e/KickOffApproval.service?wsdl';
+	    var urlWSDL = 'https://'+ pcsTargetServer+ ':443/soa-infra/services/default/TakeThree!1*soa_8a16e235-9036-4d22-bc36-f5a32c2b496e/KickOffApproval.service?wsdl';
         soap.createClient(urlWSDL, function(err, client) {		
 	  if (err) {
          addToLogFile("Error in handling PCS call "+JSON.stringify(err)); 
