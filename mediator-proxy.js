@@ -758,7 +758,7 @@ console.log("request path="+request.path);
 var url_parts = url.parse(request.url, true);
 var query = url_parts.query;
 console.log("query:"+query);
- addToLogFile( "\n["+dateFormat(new Date(), "dddd, mmmm dS, yyyy, h:MM:ss TT")+"] Handle SOA CS (GET) request for '+ request.url + request.path +', forwarded to "
+ addToLogFile( "\n["+dateFormat(new Date(), "dddd, mmmm dS, yyyy, h:MM:ss TT")+"] Handle SOA CS (GET) request for "+ request.url + request.path +", forwarded to "
  +optionsSOACS.host+":"+optionsSOACS.port+optionsSOACS.path+ "options object: "+JSON.stringify(optionsSOACS));
 
   console.log('forward host and port  '+optionsSOACS.targetServer+":"+optionsSOACS.port);
