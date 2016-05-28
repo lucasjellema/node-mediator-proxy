@@ -40,6 +40,7 @@ var icsPassword = 'bIndinG@4UiguR';
 
 
  var icsTargetServer = "icsdem0058service-icsdem0058.integration.us2.oraclecloud.com";
+ var soacsTargetServer = "140.86.4.95";
 
 
 var logFile = 'mediator-proxy.txt';
@@ -721,13 +722,13 @@ function handleSOACSPost(req, res) {
 http://stackoverflow.com/questions/10435407/proxy-with-express-js
 */
  var targetServer = "140.86.4.95";
-  /* http://140.86.4.95:80/soa-infra/services/aced-cloud-demo/ProposedActsService/ProposedActsService?wsdl */
+  /* http://140.86.4.95:8080/soa-infra/services/aced-cloud-demo/ProposedActsService/ProposedActsService?wsdl */
  var targetPath = req.url.substring(6);
  var targetPort=8080;
  console.log('SOACS POST forward host and port  '+targetServer+":"+targetPort);
  var targetUrl = "http://"+targetServer+":"+targetPort+targetPath;
 
- addToLogFile( "\n["+dateFormat(new Date(), "dddd, mmmm dS, yyyy, h:MM:ss TT")+"] Handle SOA CS request, forwarded to "+targetUrl);
+ addToLogFile( "\n["+dateFormat(new Date(), "dddd, mmmm dS, yyyy, h:MM:ss TT")+"] Handle SOA CS (POST) request, forwarded to "+targetUrl);
 
  console.log('forward path '+targetUrl);
  var route_request = request.post({uri: targetUrl, json: req.body});
@@ -757,8 +758,8 @@ console.log("request path="+request.path);
 var url_parts = url.parse(request.url, true);
 var query = url_parts.query;
 console.log("query:"+query);
- addToLogFile( "\n["+dateFormat(new Date(), "dddd, mmmm dS, yyyy, h:MM:ss TT")+"] Handle SOA CS request, forwarded to "
- +optionsSOACS.targetServer+":"+optionsSOACS.port+optionsSOACS.path);
+ addToLogFile( "\n["+dateFormat(new Date(), "dddd, mmmm dS, yyyy, h:MM:ss TT")+"] Handle SOA CS (GET) request for '+ request.url + request.path +', forwarded to "
+ +optionsSOACS.host+":"+optionsSOACS.port+optionsSOACS.path+ "options object: "+JSON.stringify(optionsSOACS));
 
   console.log('forward host and port  '+optionsSOACS.targetServer+":"+optionsSOACS.port);
   console.log('forward path '+optionsSOACS.path);
