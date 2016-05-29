@@ -192,267 +192,6 @@ function handleArtistsAPI(req, res) {
 
  } //handleArtistsAPI
 
-
-/* deal with (WSDL get requests to PCS */
-function handlePCSGet(req, res) {
-
- var targetPath = req.url.substring(4); // anything after /pcs
- var targetPort=443;
-
- console.log('PCS request '+ req.method);
- var targetUrl = "https://"+pcsTargetServer+":"+targetPort+targetPath;
- console.log('forward path '+targetUrl);
-
- addToLogFile( "\n["+dateFormat(new Date(), "dddd, mmmm dS, yyyy, h:MM:ss TT")+"] Handle PCS REST "+req.method+" Request to "+targetUrl);
- addToLogFile( "\nBody:\n"+JSON.stringify(req.body)+ "\n ");
- 
- var route_options ={};
- var url_parts = url.parse(req.url, true);
- var query = url_parts.query;
- var isWsdlRequest = false;
- if (query.hasOwnProperty('wsdl')) {
-   console.log("Request a WSDL document");
-    isWsdlRequest = true;
- }
- 
- // delete route_options.protocol;
- route_options.method = req.method;
- route_options.uri = targetUrl;
- route_options.json = req.body;
-  if (isWsdlRequest) {
-    request(route_options, function (error, response, body) {
-    if (!error && response.statusCode == 200) {
-	  // replace all endpoint references in WSDL document to ICS with references to proxy:
-      var data = body.replace(/https\:\/\/pcs1\-gse00000196\.process.us2\.oraclecloud\.com\:443/g,"http://"+proxyServerIP+"/pcs");
-      res.writeHead(response.statusCode, response.headers);
-      res.end(data);
-	}
-  });//request
- } 
- } //handlePCSGet
-
- 
-/* deal with SOAP calls to PCS */
-function handlePCSPost(req, res) {
-  if (req.url.indexOf('/pcs/rest/')> -1 ) { 
-//  if (req.url.startsWith("/pcs/rest")) {
-    handlePCSRestPost(req, res);
-    return;
-  }
-
- addToLogFile( "\n["+dateFormat(new Date(), "dddd, mmmm dS, yyyy, h:MM:ss TT")+"] Handle PCS POST "+req.method+" Request to "+req.url);
- addToLogFile( "\nBody:\n"+req.body+ "\n ");
-
- // turn SOAP Envelope to JSON object
- xml2js.parseString(req.body
- , function (err, result) {
-    addToLogFile( "\n JSON Result of parsing HTTP BODY:\n"+JSON.stringify(result)+ "\n ");
-
-	var soapNSPrefix = searchKeyWithValue( result, "http://schemas.xmlsoap.org/soap/envelope/" ).substring(6);
-	console.log('PCS POST soapNSPrefix'+soapNSPrefix);
-	var body = result[soapNSPrefix+':Envelope'][soapNSPrefix+':Body'];
-    addToLogFile( "\nSoap Body :\n"+JSON.stringify(body)+ "\n ");
-	console.log("body part 0 "+JSON.stringify(body[0]));
-	   
-	// test for TakeThree namespace   
-	if ( JSON.stringify(result).indexOf("http://xmlns.oracle.com/bpmn/bpmnCloudProcess/TakeThree/KickOffApproval") > -1 ){
-	  var acedXMLNSPrefix = searchKeyWithValue( body[0], "http://xmlns.oracle.com/bpmn/bpmnCloudProcess/TakeThree/KickOffApproval" );
-	  console.log('acedXMLNSPrefix'+acedXMLNSPrefix);
-	  if (!acedXMLNSPrefix) {
-	    acedXMLNSPrefix = searchKeyWithValue( result, "http://xmlns.oracle.com/bpmn/bpmnCloudProcess/TakeThree/KickOffApproval" );
-	    console.log('not found at first - acedXMLNSPrefix'+acedXMLNSPrefix);
-   	  }
-	  var acedPrefix ="";
-	
-	  if ("xmlns"===acedXMLNSPrefix) {acedPrefix ="";}
-	  else {acedPrefix =acedXMLNSPrefix.substring(6)+":";};	
-	  console.log('acedPrefix'+acedPrefix);
-	  console.log('acedNSPrefix'+acedPrefix);
-      //when parsing is done, interpret the object
-	  if (body[0][acedPrefix+'start']) {
-   	    var r = body[0][acedPrefix+'start'];	
-	    console.log('r : '+JSON.stringify(r));
-	    var artistName = r[0]['name']+"";
-		artistName = artistName.replace(/_/g," ");
-        var actProposal = { name:  artistName
-                      , voteCount :  r[0]['voteCount']
-                      };
-	    console.log('actproposal after _ replace : '+JSON.stringify(actProposal));
-
-	    // create a JavaScript proxy-client for the WebService at the specified URL (in PCS)				  
-	    // TODO replace with endpoint for the PCS process WSDL
-	    var urlWSDL = 'https://'+ pcsTargetServer+ ':443/soa-infra/services/default/TakeThree!1*soa_8a16e235-9036-4d22-bc36-f5a32c2b496e/KickOffApproval.service?wsdl';
-        soap.createClient(urlWSDL, function(err, client) {		
-	  if (err) {
-         addToLogFile("Error in handling PCS call "+JSON.stringify(err)); 
-      } else {
-       try {   
-	    // this setting is required for PCS
-  	    client.setSecurity(new soap.WSSecurity(pcsUsername, pcsPassword))
-        client.start
-        ( actProposal
-	    , function(err, result, raw, soapHeader) {      
-            addToLogFile( "\n => Soap Response for Submit Response Body :\n"+raw+ "\n ");
-			res.writeHead(200, {'Content-Type': 'text/xml'});
-            res.end(raw);
-          }// callback on response from SOAP WebService
-        );
-      }
-      catch(err) {
-         addToLogFile("Error in handling PCS call "+JSON.stringify(err));     
-      }// catch 
-      }// try
-      } //else
-      );//createClient
-     }// if 	start
-   }// if TakeThree namespace 
-
-	   
-	// test for ArtistProposalProcess/SubmitActProposal namespace   
-	if ( JSON.stringify(result).indexOf("http://xmlns.oracle.com/bpmn/bpmnCloudProcess/ArtistProposalProcess/SubmitActProposal") > -1 ){
-	  var acedXMLNSPrefix = searchKeyWithValue( body[0], "http://xmlns.oracle.com/bpmn/bpmnCloudProcess/ArtistProposalProcess/SubmitActProposal" );
-	  console.log('acedXMLNSPrefix'+acedXMLNSPrefix);
-	  if (!acedXMLNSPrefix) {
-	    acedXMLNSPrefix = searchKeyWithValue( result, "http://xmlns.oracle.com/bpmn/bpmnCloudProcess/ArtistProposalProcess/SubmitActProposal" );
-	    console.log('not found at first - acedXMLNSPrefix'+acedXMLNSPrefix);
-   	  }
-	  var acedPrefix ="";
-	
-	  if ("xmlns"===acedXMLNSPrefix) {acedPrefix ="";}
-	  else {acedPrefix =acedXMLNSPrefix.substring(6)+":";};	
-	  console.log('acedPrefix'+acedPrefix);
-	  console.log('acedNSPrefix'+acedPrefix);
-      //when parsing is done, interpret the object
-	  if (body[0][acedPrefix+'start']) {
-   	    var r = body[0][acedPrefix+'start'];	
-	    console.log('r : '+JSON.stringify(r));
-	  
-	    var artistName = r[0]['name']+"";
-		artistName = artistName.replace(/_/g," ");
-        var actProposal = { name:  artistName
-                      , voteCount :  r[0]['voteCount']
-                      };
-	    console.log('actproposal after _ replacement : '+JSON.stringify(actProposal));
-
-	    // create a JavaScript proxy-client for the WebService at the specified URL (in PCS)				  
-	    // TODO: replace with proper PCS process instance endpoint
-	    var urlWSDL = 'https://'+ pcsTargetServer+'/soa-infra/services/default/ArtistProposalProcess!1.0*soa_68f55698-0293-4386-b2f6-aa6ee69b497f/SubmitActProposal.service?WSDL';
-        soap.createClient(urlWSDL, function(err, client) {		
-	  if (err) {
-         addToLogFile("Error in handling PCS call "+JSON.stringify(err)); 
-      } else {
-          
-       try {   
-	    // this setting is required for PCS
-  	    client.setSecurity(new soap.WSSecurity(pcsUsername, pcsPassword))
-        client.start
-        ( actProposal
-	    , function(err, result, raw, soapHeader) {      
-            addToLogFile( "\n => Soap Response for Submit Response Body :\n"+raw+ "\n ");
-			res.writeHead(200, {'Content-Type': 'text/xml'});
-            res.end(raw);
-          }// callback on response from SOAP WebService
-        );
-      }
-      catch(err) {
-         addToLogFile("Error in handling PCS call "+JSON.stringify(err));     
-      }// catch 
-      }// try
-      } //else
-      );//createClient
-     }// if 	start
-   }// if ArtistProposalProcess/SubmitActProposal namespace  
-
-   
-  });//xml2js
-
-} //handlePCSPost
- 
-/* make a SOAP call to PCS based on a REST request and return a REST response, no matter how meaningless*/
-function handlePCSRestPost(req, res) {
-
- addToLogFile( "\n["+dateFormat(new Date(), "dddd, mmmm dS, yyyy, h:MM:ss TT")+"] Handle PCS REST POST and turn into one way SOAP Call"+req.method+" Request to "+req.url);
- addToLogFile( "\nBody:\n"+JSON.stringify(req.body)+ "\n ");
-
-	    var artistName = req.body.artistProposal.artistName+"";
-		artistName = artistName.replace(/_/g," ");
- 
-    var actProposal = { name:  artistName
-                      , voteCount :  req.body.artistProposal.numberOfVotes
-                      };
-	console.log('actproposal : '+JSON.stringify(actProposal));
-
-					  // create a JavaScript proxy-client for the WebService at the specified URL (in ICS)				  
-	 var urlWSDL = 'https://'+ pcsTargetServer+ '/soa-infra/services/default/ArtistProposalProcess!1.0*soa_68f55698-0293-4386-b2f6-aa6ee69b497f/SubmitActProposal.service?WSDL';
- 
- 
-    soap.createClient(urlWSDL, function(err, client) {		
-	  if (err) {
-         addToLogFile("Error in handling PCS call "+JSON.stringify(err)); 
-      } else {
-          
-       try {   
-      // this setting is required for ICS
-	  client.setSecurity(new soap.WSSecurity(pcsUsername, pcsPassword))
-      client.start
-      ( actProposal
-	  , function(err, result, raw, soapHeader) {      
-			res.writeHead(200, {'Content-Type': 'application/json'});
-			var response = {"artistProposalSubmissionResult" : { "status" : "OK, I guess for "+ actProposal.name}};
-            res.end(JSON.stringify(response));
-        }// callback on response from SOAP WebService
-      );//clientStart
-      }
-      catch(err) {
-         addToLogFile("Error in handling PCS call "+JSON.stringify(err));     
-      }// catch 
-      }// try
-      } //else
-    );//createClient
-   
-} //handlePCSRestPost
- 
-
-/* make a SOAP call to PCS based on a REST request and return a REST response, no matter how meaningless*/
-function handlePCSRestPosthandlePCSRestPostTakeThree(req, res) {
-
- addToLogFile( "\n["+dateFormat(new Date(), "dddd, mmmm dS, yyyy, h:MM:ss TT")+"] Handle PCS REST POST and turn into one way SOAP Call"+req.method+" Request to "+req.url);
- addToLogFile( "\nBody:\n"+JSON.stringify(req.body)+ "\n ");
- 
-    var actProposal = { name:  req.body.artistProposal.artistName.replace(/_/g," ")
-                      , voteCount :  req.body.artistProposal.numberOfVotes
-                      };
-	console.log('handlePCSRestPosthandlePCSRestPostTakeThree:  actproposal : '+JSON.stringify(actProposal));
-
-					  // create a JavaScript proxy-client for the WebService at the specified URL (in ICS)				  
-	 var urlWSDL = 'https://'+ pcsTargetServer+':443/soa-infra/services/default/TakeThree!1*soa_8a16e235-9036-4d22-bc36-f5a32c2b496e/KickOffApproval.service?wsdl';
-    soap.createClient(urlWSDL, function(err, client) {		
-	  if (err) {
-         addToLogFile("Error in handling PCS call "+JSON.stringify(err)); 
-      } else {
-          
-       try {   
-	  // this setting is required for ICS
-	  client.setSecurity(new soap.WSSecurity(pcsUsername, pcsPassword))
-      client.start
-      ( actProposal
-	  , function(err, result, raw, soapHeader) {      
-			res.writeHead(200, {'Content-Type': 'application/json'});
-			var response = {"artistProposalSubmissionResult" : { "status" : "OK, I guess for "+ actProposal.name}};
-            res.end(JSON.stringify(response));
-        }// callback on response from SOAP WebService
-      );//clientStart
-      }
-      catch(err) {
-         addToLogFile("Error in handling PCS call "+JSON.stringify(err));     
-      } 
-
-    }
-      }
-          );//createClient
-   
-} //handlePCSRestPostTakeThree
-  
  
 function getValue(property, prefix, obj) {
 console.log('extract property '+ property+' - prfefix '+' - obj '+JSON.stringify(obj) );
@@ -464,186 +203,6 @@ console.log('extract property '+ property+' - prfefix '+' - obj '+JSON.stringify
 	  }
 	return value;
 }//getValue
-
-/* deal with (REST and SOAP) calls to ICS */
-function handleICSPost(req, res) {
- if (req.url.indexOf('/rest/')> -1 ) { 
-   handleICS(req, res);
- } else 
- {
-
- addToLogFile( "\n["+dateFormat(new Date(), "dddd, mmmm dS, yyyy, h:MM:ss TT")+"] Handle ICS POST "+req.method+" Request to "+req.url);
- addToLogFile( "\nBody:\n"+req.body+ "\n ");
-
- // turn SOAP Envelope to JSON object
- xml2js.parseString(req.body
- , function (err, result) {
-    addToLogFile( "\n JSON Result of parsing HTTP BODY:\n"+JSON.stringify(result)+ "\n ");
-
-	var soapNSPrefix = searchKeyWithValue( result, "http://schemas.xmlsoap.org/soap/envelope/" ).substring(6);
-	console.log('soapNSPrefix'+soapNSPrefix);
-	var body = result[soapNSPrefix+':Envelope'][soapNSPrefix+':Body'];
-    addToLogFile( "\nSoap Body :\n"+JSON.stringify(body)+ "\n ");
-	console.log("body part 0 "+JSON.stringify(body[0]));
-	   
-	if ( JSON.stringify(body[0]).indexOf("submitActProposalRequestMessage") > -1 ){
-	   
-
-	var acedXMLNSPrefix = searchKeyWithValue( body[0], "aced.cloud.demo.ics" );
-	console.log('acedXMLNSPrefix'+acedXMLNSPrefix);
-	if (!acedXMLNSPrefix) {
-	  acedXMLNSPrefix = searchKeyWithValue( result, "aced.cloud.demo.ics" );
-	console.log('not found at first - acedXMLNSPrefix'+acedXMLNSPrefix);
-	}
-	var acedPrefix ="";
-	
-	if ("xmlns"===acedXMLNSPrefix) {acedPrefix ="";}
-	else {acedPrefix =acedXMLNSPrefix.substring(6)+":";};
-	
-	console.log('acedPrefix'+acedPrefix);
-
-
-//	var acedNSPrefix = searchKeyWithValue( result, "aced.cloud.demo" ).substring(6);;
-	console.log('acedNSPrefix'+acedPrefix);
-    //when parsing is done, interpret the object
-	if (body[0][acedPrefix+'submitActProposalRequestMessage']) {
-   	  var request = body[0][acedPrefix+'submitActProposalRequestMessage'];	
-	  
-    var actProposal = { artistName: getValue('artistName', acedPrefix, request[0]) 
-                      , numberOfVotes :  getValue('numberOfVotes', acedPrefix, request[0])
-                      , description: getValue('description', acedPrefix, request[0]) 
-                      ,imageURL : getValue('imageURL', acedPrefix, request[0])
-                      };
-	// create a JavaScript proxy-client for the WebService at the specified URL (in ICS)				  
-	 var url = 'https://'+ icsTargetServer+':443/integration/flowsvc/soap/PROPOSENEWACTFOR_SOAP/v01/?wsdl';
-    soap.createClient(url, function(err, client) {		
-	  // this setting is required for ICS
-	  client.setSecurity(new soap.WSSecurity(icsUsername, icsPassword))
-      client.submitActProposal
-      ( actProposal
-	  , function(err, result, raw, soapHeader) {      
-            addToLogFile( "\n => Soap Response for Submit Response Body :\n"+raw+ "\n ");
-			res.writeHead(200, {'Content-Type': 'text/xml'});
-            res.end(raw);
-        }// callback on response from SOAP WebService
-      );
-    }
-    );//createClient
-   }// if 	submitActProposalRequestMessage
-   }
-	   
-	if ( JSON.stringify(body[0]).indexOf("verifyExistenceProposalRequestMessage") > -1) {
-	   console.log("verifyExistenceProposalRequestMessage");
-    addToLogFile( "\nbody[0]:\n"+JSON.stringify(body[0])+ "\n ");
-	var acedXMLNSPrefix = searchKeyWithValue( body[0], "aced.cloud.demo" );
-	if (!acedXMLNSPrefix) {
-	  acedXMLNSPrefix = searchKeyWithValue( result, "aced.cloud.demo" );
-	}
-	var acedPrefix ="";
-	
-	if ("xmlns"===acedXMLNSPrefix) {acedPrefix ="";}
-	else {acedPrefix =acedXMLNSPrefix.substring(6)+":";};
-	
-   if (body[0][acedPrefix+'verifyExistenceProposalRequestMessage']) {
-
-   var request = body[0][acedPrefix+'verifyExistenceProposalRequestMessage'];
-   var artistName = getValue('name', acedPrefix, request[0]) ;
-/*	var artistName = request[0][acedPrefix+'name'];
-	// deal with calls from PCS
-	if (artistName[0] && artistName[0]["_"]) {
-	  artistName = artistName[0]["_"]
-	}
-	*/
-    var verifyAct = { name: artistName
-                      };
-    addToLogFile( "\n => Go invoke ICS - Verify Existence - with  :\n"+JSON.stringify(verifyAct)+ "\n ");
-
-	var url ='https://'+ icsTargetServer+'/integration/flowsvc/soap/VERIFYEXISTENCEO_FROMSOACS/v01/?wsdl';
-
-					  // create a JavaScript proxy-client for the WebService at the specified URL (in ICS)				  
-    soap.createClient(url, function(err, client) {		
-	  // this setting is required for ICS
-	  client.setSecurity(new soap.WSSecurity(icsUsername, icsPassword))
-      client.verifyExistenceActProposal
-      ( verifyAct
-	  , function(err, result, raw, soapHeader) {
-            addToLogFile( "\n => Soap Response Body :\n"+raw+ "\n ");
-			
-			res.writeHead(200, {'Content-Type': 'text/xml'});
-            res.end(raw);
-        }// callback on response from SOAP WebService
-      );
-    }
-    );//createClient
-   }// if 	verifyExistenceProposalRequestMessage
-   };//verifyExistenceProposalRequestMessage
-   
-});//xml2js
-}//else
-}// handICSPost
-
-
-/* deal with (REST and SOAP) calls to ICS */
-function handleICS(req, res) {
-
-
-/*
-http://stackoverflow.com/questions/10435407/proxy-with-express-js
-*/
-  /* 
-  https://icsdem0058service-icsdem0058.integration.us2.oraclecloud.com:443/integration/flowsvc/soap/PROPOSENEWACTFOR_SOAP/v01/
-  and
-  https://icsdem0058service-icsdem0058.integration.us2.oraclecloud.com/integration/flowapi/rest/PROPOSENEWACTFOROOW2016/v01/actproposals
-  
-  localhost:5100/ics/integration/flowsvc/soap/PROPOSENEWACTFOR_SOAP/v01/?wsdl
-  
-  */
- var targetPath = req.url.substring(4); // anything after /ics
- var targetPort=443;
- // credentials for ICS
-console.log('ICS request '+ req.method);
- var targetUrl = "https://"+icsTargetServer+":"+targetPort+targetPath;
- console.log('forward path '+targetUrl);
-
- addToLogFile( "\n["+dateFormat(new Date(), "dddd, mmmm dS, yyyy, h:MM:ss TT")+"] (function handleICS) Handle ICS REST "+req.method+" Request to "+targetUrl);
- addToLogFile( "\nBody:\n"+JSON.stringify(req.body)+ "\n ");
- addToLogFile( "\nBody could be manipulated - :\n"+JSON.stringify(req.body).indexOf("data_artistname_2")+ "\n ");
- 
- 
- var route_options ={};
- var url_parts = url.parse(req.url, true);
- var query = url_parts.query;
- var isWsdlRequest = false;
- if (query.hasOwnProperty('wsdl')) {
-   console.log("Request a WSDL document");
-    isWsdlRequest = true;
- }
- 
- // delete route_options.protocol;
- route_options.method = req.method;
- route_options.uri = targetUrl;
- route_options.json = req.body;
- route_options.auth = {
-                        'user': icsUsername,
-                        'pass': icsPassword,
-                        'sendImmediately': false
-                      };
- if (isWsdlRequest) {
-    request(route_options, function (error, response, body) {
-    if (!error && response.statusCode == 200) {
-	  // replace endpoint references in WSDL document to ICS with references to proxy:
-      var data = body.replace(/https\:\/\/icsdem0058service\-icsdem0058\.integration\.us2\.oraclecloud\.com\:443/g,"http://"+proxyServerIP+"/ics");
-
-      res.writeHead(response.statusCode, response.headers);
-      res.end(data);
-	}
-  });//request
- } 
-else {
-  var route_request = request(route_options);
-  req.pipe(route_request).pipe(res);
-} 
- } //handleICS
 
 
 function handleC3(req, res) {
@@ -660,6 +219,7 @@ function handleC3(req, res) {
  } //handleC3
 
 
+
 /* deal with all requests to MCS */
 function handleMCS(req, res) {
 /*
@@ -669,42 +229,13 @@ https://mobileportalsetrial1304dev-mcsdem0001.mobileenv.us2.oraclecloud.com:443/
 */
 
 
- var targetServer = "mobileportalsetrial1304dev-mcsdem0001.mobileenv.us2.oraclecloud.com";
  var targetPath = req.url.substring(4);// chop off the mcs/
  var targetPort=443;
- console.log('MCS  forward host and port  '+targetServer+":"+targetPort);
- var targetUrl = "https://"+targetServer+":"+targetPort+targetPath;
+ console.log('MCS  forward host and port  '+settings.mcsServer+":"+targetPort);
+ var targetUrl = "https://"+settings.mcsServer+":"+targetPort+targetPath;
  console.log('forward path '+targetUrl);
  addToLogFile( "\n["+dateFormat(new Date(), "dddd, mmmm dS, yyyy, h:MM:ss TT")+"] Handle MCS request, forwarded to "+targetUrl);
-
- 
- // before it was just:
- 
- 
- 
-   req.pipe(request(targetUrl)).pipe(res);
- 
- // now I have brought CORS support into the picture:
- /*
-  var data="";
-  var rq = req.pipe(request(targetUrl));
-    rq.on('data', function(d) {
-    console.log("on receive data");
-    process.stdout.write(d);
-	data=data+d;
-    console.log("data = "+data);
-  });//data
-
-  rq.on('end', function() {
-    console.log("end receive data");
-    console.log('data = '+ data);
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
-    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
-    res.setHeader('Access-Control-Allow-Credentials', true);
-    res.end(data);
-  });//on end
-  */
+ req.pipe(request(targetUrl)).pipe(res);
  
  } //handleMCS
  
@@ -892,14 +423,24 @@ function handleArtists(req, res) {
   var query = url_parts.query;
   addToLogFile( "\n["+dateFormat(new Date(), "dddd, mmmm dS, yyyy, h:MM:ss TT")+"] Handle Artist Enrichment request for "+ query.artist+" directly to spotify , forwarded to "+spotifyAPI + '/search?q='+encodeURI(query.artist)+'&type=artist');
  
-  request(spotifyAPI + '/search?q='+encodeURI(query.artist)+'&type=artist', function (error, response, body) {  
+  request(spotifyAPI + '/search?q='+encodeURI(query.artist)+'&type=artist', function (error, response, body) {
+      console.log("Spotify "+JSON.stringify(response));  
     if (!error && response.statusCode == 200) {
+console.log("no error from spotify");
       var artistsResponse = JSON.parse(body);
       var artist ={};
 	  // if the artist has not been found, return immediately
 	  
 	  if (artistsResponse.artists.total==0) {
-	    res.status(200).send(JSON.stringify(artist));
+        console.log("no artists were found for the quert string "+query.artist);
+        artist.spotifyId ="-1";  
+        artist.found = "false";
+        artist.name= query.artist;  
+        res.set( {'Content-Type': 'application/json'});
+        res.status(response.statusCode); //
+        res.send(JSON.stringify(artist));
+        res.end();
+ 
 		return;
 	  }
       artist.spotifyId = artistsResponse.artists.items[0].id;
@@ -945,9 +486,11 @@ function handleArtists(req, res) {
 					  , function (error, response, body) {  
                           if (!error && response.statusCode == 200) {
                           var echonestBioSearchResponse = JSON.parse(body);
-                          var bio = echonestBioSearchResponse.response.biographies[0].text;
-    					  artist.biography = bio;
-							res.setHeader('Content-Type', 'application/json; charset=utf-8');
+                          if (echonestBioSearchResponse.response.biographies[0]) {
+                            var bio = echonestBioSearchResponse.response.biographies[0].text;
+      					    artist.biography = bio;
+                          }
+					   res.setHeader('Content-Type', 'application/json; charset=utf-8');
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
     res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
