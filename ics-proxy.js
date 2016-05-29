@@ -158,12 +158,21 @@ http://stackoverflow.com/questions/10435407/proxy-with-express-js
 console.log('ICS request '+ req.method);
  var targetUrl = "https://"+icsTargetServer+":"+targetPort+targetPath;
  console.log('forward path '+targetUrl);
-console.log('add to logifle');
  addToLogFile( "\n["+dateFormat(new Date(), "dddd, mmmm dS, yyyy, h:MM:ss TT")+"] ICS thingie");
  addToLogFile( "\n["+dateFormat(new Date(), "dddd, mmmm dS, yyyy, h:MM:ss TT")+"] Handle ICS REST "+req.method+" Request to "+targetUrl);
-console.log('add to logifle');
  addToLogFile( "\nBody:\n"+JSON.stringify(req.body)+ "\n ");
-console.log('add to logifle');
+
+// new:  , "payload" :     { "data":  {" data_artistname_2": "talking heads", " count_of_artistname": 48}
+
+// original   , "payload" :     { "data":  {"max_of_data_hashtag": "talking heads", "count_of_data_hashtag": 48}
+
+ if (req.body[0].payload.data[' data_artistname_2']) { req.body[0].payload.data.max_of_data_hashtag = req.body[0].payload.data[' data_artistname_2'];} 
+ if (req.body[0].payload.data[' count_of_artistname']) { req.body[0].payload.data.count_of_data_hashtag = req.body[0].payload.data[' count_of_artistname'];} 
+
+ if (req.body[0].payload.data.max_of_data_hashtag) { req.body[0].payload.data.data_artistname_2 = req.body[0].payload.data.max_of_data_hashtag;} 
+ if (req.body[0].payload.data.count_of_data_hashtag) { req.body[0].payload.data.count_of_artistname = req.body[0].payload.data.count_of_data_hashtag;}
+  
+ if (req.body[0].payload.data.data_artistname_2) { req.body[0].payload.data.max_of_data_hashtag = req.body[0].payload.data.data_artistname_2;} 
  
  var route_options ={};
  var url_parts = url.parse(req.url, true);
@@ -204,6 +213,7 @@ else { /* not a WSDL request*/
         console.log("BODY:"+JSON.stringify(body));
         res.set(  response.headers);
         res.status(response.statusCode); //
+        
         res.send(body);
         res.end();
     }
