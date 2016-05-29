@@ -163,9 +163,9 @@ console.log('ICS request '+ req.method);
  addToLogFile( "\nBody:\n"+JSON.stringify(req.body)+ "\n ");
 
 // new:  , "payload" :     { "data":  {" data_artistname_2": "talking heads", " count_of_artistname": 48}
-
 // original   , "payload" :     { "data":  {"max_of_data_hashtag": "talking heads", "count_of_data_hashtag": 48}
 
+if (targetPath.indexOf("IOTC_DROP_AND_ROUT_TO_PCS_COMM") >-1) {
  if (req.body[0].payload.data[' data_artistname_2']) { req.body[0].payload.data.max_of_data_hashtag = req.body[0].payload.data[' data_artistname_2'];} 
  if (req.body[0].payload.data[' count_of_artistname']) { req.body[0].payload.data.count_of_data_hashtag = req.body[0].payload.data[' count_of_artistname'];} 
 
@@ -174,7 +174,7 @@ console.log('ICS request '+ req.method);
   
  if (req.body[0].payload.data.data_artistname_2) { req.body[0].payload.data.max_of_data_hashtag = req.body[0].payload.data.data_artistname_2;} 
  if (req.body[0].payload.data.count_of_artistname) { req.body[0].payload.data.count_of_data_hashtag = req.body[0].payload.data.count_of_artistname;} 
- 
+}
  var route_options ={};
  var url_parts = url.parse(req.url, true);
  var query = url_parts.query;
