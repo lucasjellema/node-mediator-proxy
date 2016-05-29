@@ -2,6 +2,10 @@ var logFile = 'mediator-proxy.txt';
 
 var settings = module.exports;
 settings.PORT= 80;  // Note: 5100 for running locally, 80 for running in the cloud
+//settings.PORT= 5100;  // Note: 5100 for running locally, 80 for running in the cloud
+
+settings.proxyServerIP = "104.155.85.98"; // cloud
+//settings.proxyServerIP = "127.0.0.1:5100";  // local
 
 settings.icsUsername= 'gse_cloud-admin@oracleads.com';
 settings.icsPassword = 'blOody@4PiLl';

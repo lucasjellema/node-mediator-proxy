@@ -24,6 +24,7 @@ var xml2js = require('xml2js'); //https://www.npmjs.com/package/xml2js
 
 var utils = require( "./proxy-utils.js" );
 var icsProxy = require( "./ics-proxy.js" );
+var pcsProxy = require( "./pcs-proxy.js" );
 var settings = require( "./proxy-settings.js" );
 
 /* docs:
@@ -69,7 +70,7 @@ var PORT = settings.PORT;
 
 var proxyVersion = "0.9.2"
 
-var proxyServerIP = "104.155.85.98";
+var proxyServerIP = settings.proxyServerIP;
 
 
 
@@ -147,8 +148,8 @@ app.use(bodyParser.text({ type: 'text/xml' }));
 app.use(allowCrossDomain);
 app.post('/ics/*', function(req,res){ icsProxy.handleICSPost(req, res); });
 app.get('/ics/*', function(req,res){ icsProxy.handleICS(req, res); } );
-app.get('/pcs/*', function(req,res){ handlePCSGet(req, res);} );
-app.post('/pcs/*', function(req,res){ handlePCSPost(req, res);} );
+app.get('/pcs/*', function(req,res){ pcsProxy.handlePCSGet(req, res);} );
+app.post('/pcs/*', function(req,res){ pcsProxy.handlePCSPost(req, res);} );
 
 app.all('/mcs/*', function(req,res){ handleMCS(req, res);} );
 app.all('/c3/*', function(req,res){ handleC3(req, res);} );
