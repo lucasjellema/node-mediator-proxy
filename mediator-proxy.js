@@ -125,7 +125,7 @@ app.get('/logs', function(req, res) {
     res.writeHead(200, {
         'Content-Type': 'text/plain'    });
 
-    var readStream = fs.createReadStream(logFile);
+    var readStream = fs.createReadStream(settings.logFile);
     readStream.pipe(res);
   
   });
