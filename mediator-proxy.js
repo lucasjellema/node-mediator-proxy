@@ -21,6 +21,11 @@ var https = require('https'),
 var soap = require('soap'); //https://www.npmjs.com/package/soap
 var xml2js = require('xml2js'); //https://www.npmjs.com/package/xml2js
 
+
+var utils = require( "./proxy-utils.js" );
+var icsProxy = require( "./ics-proxy.js" );
+var settings = require( "./proxy-settings.js" );
+
 /* docs:
 https://nodejs.org/api/https.html
 https://nodejs.org/api/http.html
@@ -44,7 +49,6 @@ var icsPassword = 'blOody@4PiLl';
  var soacsTargetServer = "140.86.4.95";
 
 
-var logFile = 'mediator-proxy.txt';
 var targetServer = "mockdataapi-lucasjellema.apaas.em2.oraclecloud.com";
 //var targetServer = "data-api-lucasjellema.apaas.em2.oraclecloud.com"
 /*
@@ -61,8 +65,8 @@ https.get('https://mockdataapi-lucasjellema.apaas.em2.oraclecloud.com/department
   console.error('HTTPS error '+e);
 });
 */
-var PORT =80;
-//var PORT =5100;
+var PORT = settings.PORT;
+
 var proxyVersion = "0.9.2"
 
 var proxyServerIP = "104.155.85.98";
@@ -141,8 +145,8 @@ app.use(bodyParser.json()); // for parsing application/json
 // parse an HTML body into a string 
 app.use(bodyParser.text({ type: 'text/xml' }));
 app.use(allowCrossDomain);
-app.post('/ics/*', function(req,res){ handleICSPost(req, res);} );
-app.get('/ics/*', function(req,res){ handleICS(req, res);} );
+app.post('/ics/*', function(req,res){ icsProxy.handleICSPost(req, res); });
+app.get('/ics/*', function(req,res){ icsProxy.handleICS(req, res); } );
 app.get('/pcs/*', function(req,res){ handlePCSGet(req, res);} );
 app.post('/pcs/*', function(req,res){ handlePCSPost(req, res);} );
 
@@ -1029,8 +1033,5 @@ req.end();
 } //handleArtists
 
 function addToLogFile( logEntry) {
-  fs.appendFile(logFile, logEntry, function(err)  {
-  if (err) console.log("Error happened while write to log file "+err);
-  
-});
+  utils.addToLogFile(logEntry);    
 }

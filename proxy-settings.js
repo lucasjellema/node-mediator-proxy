@@ -1,6 +1,7 @@
 var logFile = 'mediator-proxy.txt';
 
 var settings = module.exports;
+
 settings.icsUsername= 'gse_cloud-admin@oracleads.com';
 settings.icsPassword = 'blOody@4PiLl';
 settings.pcsUsername= 'cloud.admin';
