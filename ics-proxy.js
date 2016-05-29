@@ -167,13 +167,13 @@ console.log('ICS request '+ req.method);
 
 if (targetPath.indexOf("IOTC_DROP_AND_ROUT_TO_PCS_COMM") >-1) {
  if (req.body[0].payload.data[' data_artistname_2']) { req.body[0].payload.data.max_of_data_hashtag = req.body[0].payload.data[' data_artistname_2'];} 
- if (req.body[0].payload.data[' count_of_artistname']) { req.body[0].payload.data.count_of_data_hashtag = req.body[0].payload.data[' count_of_artistname'];} 
+ if (req.body[0].payload.data[' count_of_data_artistname']) { req.body[0].payload.data.count_of_data_hashtag = req.body[0].payload.data[' count_of_data_artistname'];} 
 
  if (req.body[0].payload.data.max_of_data_hashtag) { req.body[0].payload.data.data_artistname_2 = req.body[0].payload.data.max_of_data_hashtag;} 
- if (req.body[0].payload.data.count_of_data_hashtag) { req.body[0].payload.data.count_of_artistname = req.body[0].payload.data.count_of_data_hashtag;}
+ if (req.body[0].payload.data.count_of_data_hashtag) { req.body[0].payload.data.count_of_data_artistname = req.body[0].payload.data.count_of_data_hashtag;}
   
  if (req.body[0].payload.data.data_artistname_2) { req.body[0].payload.data.max_of_data_hashtag = req.body[0].payload.data.data_artistname_2;} 
- if (req.body[0].payload.data.count_of_artistname) { req.body[0].payload.data.count_of_data_hashtag = req.body[0].payload.data.count_of_artistname;} 
+ if (req.body[0].payload.data.count_of_data_artistname) { req.body[0].payload.data.count_of_data_hashtag = req.body[0].payload.data.count_of_data_artistname;} 
 }
  var route_options ={};
  var url_parts = url.parse(req.url, true);
