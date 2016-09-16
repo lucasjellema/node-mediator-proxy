@@ -158,8 +158,7 @@ http://stackoverflow.com/questions/10435407/proxy-with-express-js
 console.log('ICS request '+ req.method);
  var targetUrl = "https://"+icsTargetServer+":"+targetPort+targetPath;
  console.log('forward path '+targetUrl);
- addToLogFile( "\n["+dateFormat(new Date(), "dddd, mmmm dS, yyyy, h:MM:ss TT")+"] ICS thingie");
- addToLogFile( "\n["+dateFormat(new Date(), "dddd, mmmm dS, yyyy, h:MM:ss TT")+"] Handle ICS REST "+req.method+" Request to "+targetUrl);
+addToLogFile( "\n["+dateFormat(new Date(), "dddd, mmmm dS, yyyy, h:MM:ss TT")+"] Handle ICS REST "+req.method+" Request to "+targetUrl);
  addToLogFile( "\nBody:\n"+JSON.stringify(req.body)+ "\n ");
 
 // new:  , "payload" :     { "data":  {" data_artistname_2": "talking heads", " count_of_artistname": 48}

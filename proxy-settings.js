@@ -5,17 +5,16 @@ settings.PORT= 80;  // Note: 5100 for running locally, 80 for running in the clo
 
 settings.logFile = 'mediator-proxy.txt';
 
-
-settings.proxyServerIP = "104.155.85.98"; // cloud
+settings.proxyServerIP = "104.155.49.139"; // cloud
 //settings.proxyServerIP = "127.0.0.1:5100";  // local
 
-settings.icsUsername= 'gse_cloud-admin@oracleads.com';
-settings.icsPassword = 'blOody@4PiLl';
-settings.pcsUsername= 'cloud.admin';
-    settings.pcsPassword = 'preservedPoundage=4';
+settings.icsUsername= 'soaring';
+settings.icsPassword = 'Oow2016';
+settings.pcsUsername= 'soaring';
+settings.pcsPassword = 'Oow2016';
 
-
-settings.icsTargetServer = "icsdem0058service-icsdem0058.integration.us2.oraclecloud.com";
+settings.icsTargetServer = "integrationtrial5550-deoracleem99369.integration.us2.oraclecloud.com";
+//old: june 2016: settings.icsTargetServer = "icsdem0058service-icsdem0058.integration.us2.oraclecloud.com";
 settings.pcsTargetServer = "pcs1-gse00000196.process.us2.oraclecloud.com"; // identity domain gse00000196 
 settings.soacsTargetServer = "140.86.4.95";
 

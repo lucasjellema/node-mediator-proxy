@@ -245,7 +245,7 @@ function handleSOACSPost(req, res) {
 /*
 http://stackoverflow.com/questions/10435407/proxy-with-express-js
 */
- var targetServer = "140.86.4.95";
+ var targetServer = soacsTargetServer;
   /* http://140.86.4.95:8080/soa-infra/services/aced-cloud-demo/ProposedActsService/ProposedActsService?wsdl */
  var targetPath = req.url.substring(6);
  var targetPort=8080;
@@ -261,7 +261,7 @@ http://stackoverflow.com/questions/10435407/proxy-with-express-js
 
 function handleSOACS(request, response) {
 
-var targetServer = "140.86.4.95";
+var targetServer = soacsTargetServer;
 
 /* 
 NOTE: any reference in the response to 140.86.4.95:8080/soa-infra should be removed and replaced with a reference to 104.155.85.98/soacs/soa-infra
@@ -299,7 +299,7 @@ console.log("query:"+query);
 	data=data+d;
     console.log("data = "+data);
 	// replace references to SOA CS machine with references to proxy service
-	data = data.replace("140.86.4.95:8080/soa-infra",proxyServerIP+"/soacs/soa-infra");
+	data = data.replace(soacsTargetServer+":8080/soa-infra",proxyServerIP+"/soacs/soa-infra");
   });//data
 
   res.on('end', function() {
@@ -469,13 +469,29 @@ console.log("no error from spotify");
 		 /*  NOTE: I can use https://api.spotify.com/v1/albums/?ids=41MnTivkwTO3UUJ8DrqEJJ,6JWc4iAiJ9FjyK0B59ABb4,6UXCm6bOO4gFlDQZV5yL37
 		           to retrieve details for 20 albums at a time - including release date and tracks.  (see https://developer.spotify.com/web-api/get-several-albums/) 
 				   */
-		 
+		 console.log("done getting albums");
+					   res.setHeader('Content-Type', 'application/json; charset=utf-8');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
+    res.setHeader('Access-Control-Allow-Credentials', true);
+              res.statusCode =200;
+                          res.send(JSON.stringify(artist));
+         
+         
+         
+         /*
 		 var echoNestAPI = "http://developer.echonest.com/api/v4";
 		 var echoNestDeveloperKey = "0B3N8LMO4XG3BXPSY";
 		 var searchURL = echoNestAPI+ "/artist/search";
 		 var biographiesURL = echoNestAPI+ "/artist/biographies";
-         request(searchURL + '?api_key='+echoNestDeveloperKey+'&format=json&name='+encodeURI(query.artist)+'&results=1', function (error, response, body) {  
+		 console.log("go invoke echonest API");
+         request(searchURL + '?api_key='+echoNestDeveloperKey+'&format=json&name='+encodeURI(query.artist)+'&results=1', function (error, response, body) {
+             		 console.log("done Echonest"+error +" status "+ response.statusCode);
+  
             if (!error && response.statusCode == 200) {
+                	 console.log("done Echonest"+body);
+  
                 var echonestSearchResponse = JSON.parse(body);
                 var echonestArtistId = echonestSearchResponse.response.artists[0].id;
 				artist.echonestArtistId = echonestArtistId;
@@ -503,10 +519,10 @@ console.log("no error from spotify");
 						  console.log('error '+error+" status "+response.statusCode );
 						  }
 						}
-				);// request
+				);// request bioURL
 		 
 //		 /artist/biographies?api_key=0B3N8LMO4XG3BXPSY&id=ARH6W4X1187B99274F&format=json&results=1&start=0&license=cc-by-sa
-		 /* retrieve biography 
+		  retrieve biography 
 		 API KEY = 0B3N8LMO4XG3BXPSY
 		 
 		 http://developer.echonest.com/docs/v4/artist.html#biographies
@@ -530,13 +546,15 @@ console.log("no error from spotify");
 		 
 		 
 		 
-		 */
+		 
 		 
 		 
 		 
 		 
 		 }}
 		 );// request echonest search
+         */
+        
       }); // handle response from albums
 	}
 })
