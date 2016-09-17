@@ -25,7 +25,10 @@ settings.pcsPassword = 'Ooow2016';
 
 settings.icsTargetServer = "integrationtrial6950-deoracleem99369.integration.us2.oraclecloud.com";
 //old: june 2016: settings.icsTargetServer = "icsdem0058service-icsdem0058.integration.us2.oraclecloud.com";
-settings.pcsTargetServer = "pcs1-gse00000196.process.us2.oraclecloud.com"; // identity domain gse00000196 
+/// old: june 2016 settings.pcsTargetServer = "pcs1-gse00000196.process.us2.oraclecloud.com"; // identity domain gse00000196
+
+settings.pcsTargetServer = "oracleprocessctrial0533-deoracleem99369.process.us2.oraclecloud.com"; // identity domain gse00000196
+ 
 settings.soacsTargetServer = "140.86.4.95";
 
 
