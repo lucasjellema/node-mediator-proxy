@@ -16,7 +16,7 @@ var xml2js = require('xml2js'); //https://www.npmjs.com/package/xml2js
 
 var icsUsername= settings.icsUsername;
 var icsPassword = settings.icsPassword;
-
+var proxyServerIP = settings.proxyServerIP; 
 
 var icsTargetServer = settings.icsTargetServer;
 
@@ -197,8 +197,7 @@ if (targetPath.indexOf("IOTC_DROP_AND_ROUT_TO_PCS_COMM") >-1) {
     request(route_options, function (error, response, body) {
     if (!error && response.statusCode == 200) {
 	  // replace endpoint references in WSDL document to ICS with references to proxy:
-      var data = body.replace(/https\:\/\/icsdem0058service\-icsdem0058\.integration\.us2\.oraclecloud\.com\:443/g,"http://"+proxyServerIP+"/ics");
-
+      var data = body.replace(/https\:\/\/integrationtrial6950\-deoracleem99369\.integration\.us2\.oraclecloud\.com\:443/g,"http://"+proxyServerIP+"/ics");
       res.writeHead(response.statusCode, response.headers);
       res.end(data);
 	}
