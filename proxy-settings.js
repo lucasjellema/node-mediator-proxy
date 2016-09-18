@@ -20,8 +20,8 @@ settings.logFile = 'mediator-proxy.txt';
 
 settings.icsUsername= 'soaring';
 settings.icsPassword = 'Ooow2016';
-settings.pcsUsername= 'soaring';
-settings.pcsPassword = 'Ooow2016';
+settings.pcsUsername= 'marks@griffiths-waite.co.uk';
+settings.pcsPassword = 'A2sj8nTS*P';
 
 settings.icsTargetServer = "integrationtrial6950-deoracleem99369.integration.us2.oraclecloud.com";
 //old: june 2016: settings.icsTargetServer = "icsdem0058service-icsdem0058.integration.us2.oraclecloud.com";

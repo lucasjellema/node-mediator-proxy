@@ -54,8 +54,10 @@ pcsProxy.handlePCSGet = function (req, res) {
     request(route_options, function (error, response, body) {
         console.log('response is in '+JSON.stringify(body));
     if (!error && response.statusCode == 200) {
+        
 	  // replace all endpoint references in WSDL document to ICS with references to proxy:
-      var data = body.replace(/https\:\/\/pcs1\-gse00000196\.process.us2\.oraclecloud\.com\:443/g,"http://"+proxyServerIP+"/pcs");
+      // oracleprocessctrial0533-deoracleem99369.process.us2.oraclecloud.com
+      var data = body.replace(/https\:\/\/oracleprocessctrial0533\-deoracleem99369\.process.us2\.oraclecloud\.com\:443/g,"http://"+proxyServerIP+"/pcs");
       res.writeHead(response.statusCode, response.headers);
       res.end(data);
 	}
@@ -143,7 +145,8 @@ pcsProxy.handlePCSPost = function (req, res) {
    }// if TakeThree namespace 
 
 	   
-	// test for ArtistProposalProcess/SubmitActProposal namespace   
+	// test for ArtistProposalProcess/SubmitActProposal namespace  
+    // http://xmlns.oracle.com/bpmn/bpmnCloudProcess/ArtistProposalProcess/SubmitActProposal 
 	if ( JSON.stringify(result).indexOf("http://xmlns.oracle.com/bpmn/bpmnCloudProcess/ArtistProposalProcess/SubmitActProposal") > -1 ){
 	  var acedXMLNSPrefix = utils.searchKeyWithValue( body[0], "http://xmlns.oracle.com/bpmn/bpmnCloudProcess/ArtistProposalProcess/SubmitActProposal" );
 	  console.log('acedXMLNSPrefix'+acedXMLNSPrefix);
@@ -171,7 +174,8 @@ pcsProxy.handlePCSPost = function (req, res) {
 
 	    // create a JavaScript proxy-client for the WebService at the specified URL (in PCS)				  
 	    // TODO: replace with proper PCS process instance endpoint
-	    var urlWSDL = 'https://'+ pcsTargetServer+'/soa-infra/services/default/ArtistProposalProcess!1.0*soa_68f55698-0293-4386-b2f6-aa6ee69b497f/SubmitActProposal.service?WSDL';
+        //https://oracleprocessctrial0533-deoracleem99369.process.us2.oraclecloud.com/soa-infra/services/default/ArtistProposalProcess!1.0*soa_f616f6ed-6b1d-4268-82d4-1beb76618fb1/SubmitActProposal.service?wsdl
+	    var urlWSDL = 'https://'+ pcsTargetServer+'/soa-infra/services/default/ArtistProposalProcess!1.0*soa_f616f6ed-6b1d-4268-82d4-1beb76618fb1/SubmitActProposal.service?wsdl';
         soap.createClient(urlWSDL, function(err, client) {		
 	  if (err) {
          addToLogFile("Error in handling PCS call "+JSON.stringify(err)); 
@@ -218,7 +222,7 @@ pcsProxy.handlePCSRestPost = function (req, res) {
 	console.log('actproposal : '+JSON.stringify(actProposal));
 
 					  // create a JavaScript proxy-client for the WebService at the specified URL (in ICS)				  
-	 var urlWSDL = 'https://'+ pcsTargetServer+ '/soa-infra/services/default/ArtistProposalProcess!1.0*soa_68f55698-0293-4386-b2f6-aa6ee69b497f/SubmitActProposal.service?WSDL';
+	 var urlWSDL = 'https://'+ pcsTargetServer+ '/soa-infra/services/default/ArtistProposalProcess!1.0*soa_f616f6ed-6b1d-4268-82d4-1beb76618fb1/SubmitActProposal.service?wsdl';
  
  
     soap.createClient(urlWSDL, function(err, client) {		
