@@ -165,6 +165,15 @@ addToLogFile( "\n["+dateFormat(new Date(), "dddd, mmmm dS, yyyy, h:MM:ss TT")+"]
 // original   , "payload" :     { "data":  {"max_of_data_hashtag": "talking heads", "count_of_data_hashtag": 48}
 
 if (targetPath.indexOf("IOTC_DROP_AND_ROUT_TO_PCS_COMM") >-1) {
+ // ICS mapping expects:    "data":  {"data_artistname_2": "talking heads", "count_of_artistname": 48}
+ 
+ // 18 sep - latest request from Danilo: ","data":{  "count_of_data_artistname_2_10":3,  "data_artistname_2":"die_toten_hosen"}
+ if (req.body[0].payload.data[' count_of_data_artistname_2_10']) { req.body[0].payload.data.count_of_artistname = req.body[0].payload.data[' count_of_data_artistname_2_10'];} 
+ if (req.body[0].payload.data.count_of_data_artistname_2_10) { req.body[0].payload.data.count_of_artistname = req.body[0].payload.data.count_of_data_artistname_2_10;} 
+ if (req.body[0].payload.data[' data_artistname_2']) { req.body[0].payload.data.data_artistname_2 = req.body[0].payload.data[' data_artistname_2'];} 
+ if (req.body[0].payload.data.data_artistname_2) { req.body[0].payload.data.data_artistname_2 = req.body[0].payload.data.data_artistname_2;} 
+
+    
  if (req.body[0].payload.data[' data_artistname_2']) { req.body[0].payload.data.max_of_data_hashtag = req.body[0].payload.data[' data_artistname_2'];} 
  if (req.body[0].payload.data[' count_of_data_artistname']) { req.body[0].payload.data.count_of_data_hashtag = req.body[0].payload.data[' count_of_data_artistname'];} 
 
