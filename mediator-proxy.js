@@ -24,6 +24,7 @@ var xml2js = require('xml2js'); //https://www.npmjs.com/package/xml2js
 
 var utils = require( "./proxy-utils.js" );
 var icsProxy = require( "./ics-proxy.js" );
+var icsDropoffProxy = require( "./ics-dropoff-proxy.js" );
 var pcsProxy = require( "./pcs-proxy.js" );
 var settings = require( "./proxy-settings.js" );
 
@@ -68,7 +69,7 @@ https.get('https://mockdataapi-lucasjellema.apaas.em2.oraclecloud.com/department
 */
 var PORT = settings.PORT;
 
-var proxyVersion = "0.9.2"
+var proxyVersion = "0.9.3"
 
 var proxyServerIP = settings.proxyServerIP;
 
@@ -136,6 +137,7 @@ app.get('/hello', function(req, res) {
   res.status(200).send('Hello, world!');
 });
 // [END hello_world]
+
 app.get('/hrm/*', function(req,res){ handleHRM(req, res);} );
 app.get('/conversion/*', function(req,res){ handleConversion(req, res);} );
 app.get('/soacs/*', function(req,res){ handleSOACS(req, res);} );
@@ -146,6 +148,9 @@ app.use(bodyParser.json()); // for parsing application/json
 // parse an HTML body into a string 
 app.use(bodyParser.text({ type: 'text/xml' }));
 app.use(allowCrossDomain);
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json({ type: '*/*' }));
+
 app.post('/ics/*', function(req,res){ icsProxy.handleICSPost(req, res); });
 app.get('/ics/*', function(req,res){ icsProxy.handleICS(req, res); } );
 app.get('/pcs/*', function(req,res){ pcsProxy.handlePCSGet(req, res);} );
@@ -157,6 +162,10 @@ app.all('/c3/*', function(req,res){ handleC3(req, res);} );
 app.get('/artistes/*', function(req,res){ handleArtists(req, res);} );
 app.get('/artists/*', function(req,res){ handleArtists(req, res);} );
 // what it is supposed to be app.get('/artists/*', function(req,res){ handleArtistsAPI(req, res);} );
+
+//icsDropoffProxy.registerListeners(app);
+app.post('/icsProxy/iotcs-dropoff', function(req,res){ icsDropoffProxy.handleIoT(req, res); });
+
 
 
 function searchKeyWithValue( obj, value ){
