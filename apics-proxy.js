@@ -14,7 +14,7 @@ var settings = require("./proxy-settings.js");
 var apiURL = "/apicsProxy";
 var moduleName = "accs.apicsProxy";
 
-var APICS_ENDPOINT = "129.144.150.67:8001";
+var APICS_ENDPOINT = "http://129.144.150.67:8001";
 
 
 var apicsProxy = module.exports;
@@ -24,12 +24,12 @@ apicsProxy.handleAPICS = function (req, res) {
      var url_parts = url.parse(req.url, true);
       var query = url_parts.query;
 
+      //"path":"/apicsProxy/OfmAcedemoActsApi
+var path = url_parts.path.substring("/apicsProxy".length());
     
     console.log('body in request' + JSON.stringify(req.body));
-    addToLogFile("\n[" + dateFormat(new Date(), "dddd, mmmm dS, yyyy, h:MM:ss TT") + "] APICS, forward to " +APICS_ENDPOINT+"....");
-    addToLogFile("\n[" + dateFormat(new Date(), "dddd, mmmm dS, yyyy, h:MM:ss TT") + "] raw URL: " + JSON.stringify(url_parts));
-    var iotmessage = req.body[0];
-    addToLogFile("\n[" + dateFormat(new Date(), "dddd, mmmm dS, yyyy, h:MM:ss TT") + "] IoTCS dropoff 1st message from IoTCS: " + JSON.stringify(iotmessage));
+    addToLogFile("\n[" + dateFormat(new Date(), "dddd, mmmm dS, yyyy, h:MM:ss TT") + "] APICS, forward to " +APICS_ENDPOINT+path+"....");
+    addToLogFile("\n[" + dateFormat(new Date(), "dddd, mmmm dS, yyyy, h:MM:ss TT") + "] raw URL: " + JSON.stringify(url_parts)+"path="+path);
     var options = {
         method: 'POST',
         url: APICS_ENDPOINT+'/'+'OfmAcedemoActsApi'
