@@ -25,8 +25,9 @@ var icsDropoffProxy = module.exports;
 icsDropoffProxy.handleIoT = function (req, res) {
     console.log('body in request' + JSON.stringify(req.body));
     addToLogFile("\n[" + dateFormat(new Date(), "dddd, mmmm dS, yyyy, h:MM:ss TT") + "] Handle IoTCS dropoff to ICS, forwarded to " + ICS_IOTCS_DROPOFF_ENDPOINT+"....");
-    var iotmessage = req.body;
-    addToLogFile("\n[" + dateFormat(new Date(), "dddd, mmmm dS, yyyy, h:MM:ss TT") + "] IoTCS dropoff message: " + JSON.stringify(iotmessage));
+    addToLogFile("\n[" + dateFormat(new Date(), "dddd, mmmm dS, yyyy, h:MM:ss TT") + "] raw body: " + JSON.stringify(req.body));
+    var iotmessage = req.body[0];
+    addToLogFile("\n[" + dateFormat(new Date(), "dddd, mmmm dS, yyyy, h:MM:ss TT") + "] IoTCS dropoff 1st message from IoTCS: " + JSON.stringify(iotmessage));
     var options = {
         method: 'POST',
         url: ICS_IOTCS_DROPOFF_ENDPOINT
