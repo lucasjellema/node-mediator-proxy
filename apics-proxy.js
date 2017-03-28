@@ -52,10 +52,10 @@ apicsProxy.handleAPICS = function (req, res) {
             console.log(moduleName + "- Error in processing IoT Dropoff message " + JSON.stringify(error));
             throw new Error(error);
         }
-        console.log(moduleName + " Forwarded IoT Dropoff Message to ICS: status= " + response.statusCode);
+        console.log(moduleName + " Forwarded API Platform: status= " + response.statusCode);
                         res.statusCode = response.statusCode;
                 res.setHeader('Content-Type', 'application/json');
-                res.send(JSON.stringify({ "status": "message was sent to ICS", "statusCode": response.statusCode }));
+                res.send(response.body);
 
     });
 }
@@ -65,4 +65,4 @@ function addToLogFile(logEntry) {
     utils.addToLogFile('*** Module: apics-proxy :' + logEntry);
 }
 
-console.log(moduleName + " initialized at " + apiURL + " running against ICS Endpoint " + ICS_ENDPOINT);
+console.log(moduleName + " initialized at " + apiURL + " running against APICS Endpoint " + APICS_ENDPOINT);
