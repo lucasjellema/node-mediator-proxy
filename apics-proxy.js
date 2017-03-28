@@ -25,7 +25,7 @@ apicsProxy.handleAPICS = function (req, res) {
       var query = url_parts.query;
 
       //"path":"/apicsProxy/OfmAcedemoActsApi
-var path = url_parts.path.substring("/apicsProxy".length());
+var path = url_parts.path.substring(11);
     
     console.log('body in request' + JSON.stringify(req.body));
     addToLogFile("\n[" + dateFormat(new Date(), "dddd, mmmm dS, yyyy, h:MM:ss TT") + "] APICS, forward to " +APICS_ENDPOINT+path+"....");
