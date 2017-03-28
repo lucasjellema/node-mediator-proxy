@@ -30,22 +30,19 @@ apicsProxy.handleAPICS = function (req, res) {
     console.log('body in request' + JSON.stringify(req.body));
     addToLogFile("\n[" + dateFormat(new Date(), "dddd, mmmm dS, yyyy, h:MM:ss TT") + "] APICS, forward to " + APICS_ENDPOINT + path + "....");
     addToLogFile("\n[" + dateFormat(new Date(), "dddd, mmmm dS, yyyy, h:MM:ss TT") + "] raw URL: " + JSON.stringify(url_parts) + "path=" + path);
-    var options = {
-        method: 'POST',
-        url: APICS_ENDPOINT + '/' + path
-        ,
-        headers:
-        {
-            'cache-control': 'no-cache',
-            'Accept': 'application/json',
-            'api-key': 'd4e79807-532e-46e0-ae07-b7114228b1bc',
-            'tenant-id': 'OFM2017',
-            'Authorization': 'Basic d2VibG9naWM6MVBhYVM1cGwxdA=='
+    
+    var options = { method: 'GET',
+     url: APICS_ENDPOINT +  path,
+     qs:  url_parts.query,
+  headers: 
+   { 'cache-control': 'no-cache',
+     authorization: 'Basic d2VibG9naWM6MVBhYVM1cGwxdA==',
+     accept: 'application/json',
+     'tenant-id': 'OFM2017',
+     'api-key': 'd4e79807-532e-46e0-ae07-b7114228b1bc' } };
 
 
 
-        }
-    };
     addToLogFile("\n[" + dateFormat(new Date(), "dddd, mmmm dS, yyyy, h:MM:ss TT") + "] Options for request: " + JSON.stringify(options) + "; path=" + path);
 
 
