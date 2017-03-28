@@ -17,17 +17,19 @@ var moduleName = "accs.icsProxy";
 var ICS_ENDPOINT = "https://ics4emeapartner-partnercloud17.integration.us2.oraclecloud.com/integration/flowapi/rest";
 var RESOURCE_IOTCS_DROPOFF = "ACEDEMO_IOTCSDROPO_INTEGRATIO/v01/act";
 
+var ICS_IOTCS_DROPOFF_ENDPOINT = ICS_ENDPOINT + '/' + RESOURCE_IOTCS_DROPOFF;
+
 var icsDropoffProxy = module.exports;
 
 
 icsDropoffProxy.handleIoT = function (req, res) {
     console.log('body in request' + JSON.stringify(req.body));
-    addToLogFile("\n[" + dateFormat(new Date(), "dddd, mmmm dS, yyyy, h:MM:ss TT") + "] Handle IoTCS dropoff to ICS, forwarded to " + ICS_ENDPOINT + '/' + RESOURCE_IOTCS_DROPOFF);
+    addToLogFile("\n[" + dateFormat(new Date(), "dddd, mmmm dS, yyyy, h:MM:ss TT") + "] Handle IoTCS dropoff to ICS, forwarded to " + ICS_IOTCS_DROPOFF_ENDPOINT+"....");
     var iotmessage = req.body;
     addToLogFile("\n[" + dateFormat(new Date(), "dddd, mmmm dS, yyyy, h:MM:ss TT") + "] IoTCS dropoff message: " + JSON.stringify(iotmessage));
     var options = {
         method: 'POST',
-        url: ICS_ENDPOINT + '/' + RESOURCE_IOTCS_DROPOFF
+        url: ICS_IOTCS_DROPOFF_ENDPOINT
         ,
         headers:
         {
@@ -70,15 +72,15 @@ icsDropoffProxy.handleIoT = function (req, res) {
 
 icsDropoffProxy.registerListeners =
     function (app) {
-        console.log(moduleName + " register at " + apiURL + "/iotcs-dropoff");
+        console.log("*** "+moduleName + " registered at " + apiURL + "/iotcs-dropoff");
         app.post(apiURL + '/iotcs-dropoff', function (req, res) {
             console.log('body in request' + JSON.stringify(req.body));
-            addToLogFile("\n[" + dateFormat(new Date(), "dddd, mmmm dS, yyyy, h:MM:ss TT") + "] Handle IoTCS dropoff to ICS, forwarded to " + ICS_ENDPOINT + '/' + RESOURCE_IOTCS_DROPOFF);
+            addToLogFile("\n[" + dateFormat(new Date(), "dddd, mmmm dS, yyyy, h:MM:ss TT") + "] Handle IoTCS dropoff to ICS, forwarded to " + ICS_IOTCS_DROPOFF_ENDPOINT+" ... END OF RESOURCE URL");
             var iotmessage = req.body;
             addToLogFile("\n[" + dateFormat(new Date(), "dddd, mmmm dS, yyyy, h:MM:ss TT") + "] IoTCS dropoff message: " + JSON.stringify(iotmessage));
             var options = {
                 method: 'POST',
-                url: ICS_ENDPOINT + '/' + RESOURCE_IOTCS_DROPOFF
+                url: ICS_IOTCS_DROPOFF_ENDPOINT
                 ,
                 headers:
                 {
@@ -104,10 +106,10 @@ icsDropoffProxy.registerListeners =
 
             request(options, function (error, response, body) {
                 if (error) {
-                    console.log(moduleName + "- Error in processing IoT Dropoff message " + JSON.stringify(error));
+                    console.log("*** "+ moduleName + "- Error in processing IoT Dropoff message " + JSON.stringify(error));
                     throw new Error(error);
                 }
-                console.log(moduleName + " Forwarded IoT Dropoff Message to ICS: status= " + response.statusCode);
+                console.log("*** "+ moduleName + " Forwarded IoT Dropoff Message to ICS: status= " + response.statusCode);
             });
 
 
@@ -116,7 +118,7 @@ icsDropoffProxy.registerListeners =
 
 
 function addToLogFile(logEntry) {
-    utils.addToLogFile('ics-dropoff-proxy-' + logEntry);
+    utils.addToLogFile('*** Module: ics-dropoff-proxy :' + logEntry);
 }
 
 console.log(moduleName + " initialized at " + apiURL + " running against ICS Endpoint " + ICS_ENDPOINT);
