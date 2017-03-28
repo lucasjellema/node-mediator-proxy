@@ -21,32 +21,32 @@ var apicsProxy = module.exports;
 
 
 apicsProxy.handleAPICS = function (req, res) {
-     var url_parts = url.parse(req.url, true);
-      var query = url_parts.query;
+    var url_parts = url.parse(req.url, true);
+    var query = url_parts.query;
 
-      //"path":"/apicsProxy/OfmAcedemoActsApi
-var path = url_parts.path.substring(11);
-    
+    //"path":"/apicsProxy/OfmAcedemoActsApi
+    var path = url_parts.path.substring(11);
+
     console.log('body in request' + JSON.stringify(req.body));
-    addToLogFile("\n[" + dateFormat(new Date(), "dddd, mmmm dS, yyyy, h:MM:ss TT") + "] APICS, forward to " +APICS_ENDPOINT+path+"....");
-    addToLogFile("\n[" + dateFormat(new Date(), "dddd, mmmm dS, yyyy, h:MM:ss TT") + "] raw URL: " + JSON.stringify(url_parts)+"path="+path);
+    addToLogFile("\n[" + dateFormat(new Date(), "dddd, mmmm dS, yyyy, h:MM:ss TT") + "] APICS, forward to " + APICS_ENDPOINT + path + "....");
+    addToLogFile("\n[" + dateFormat(new Date(), "dddd, mmmm dS, yyyy, h:MM:ss TT") + "] raw URL: " + JSON.stringify(url_parts) + "path=" + path);
     var options = {
         method: 'POST',
-        url: APICS_ENDPOINT+'/'+'OfmAcedemoActsApi'
+        url: APICS_ENDPOINT + '/' + path
         ,
         headers:
         {
             'cache-control': 'no-cache',
             'Accept': 'application/json',
-            'api-key':'d4e79807-532e-46e0-ae07-b7114228b1bc',
-'tenant-id':'OFM2017',
-'Authorization':'Basic d2VibG9naWM6MVBhYVM1cGwxdA=='
+            'api-key': 'd4e79807-532e-46e0-ae07-b7114228b1bc',
+            'tenant-id': 'OFM2017',
+            'Authorization': 'Basic d2VibG9naWM6MVBhYVM1cGwxdA=='
 
 
 
         }
     };
-    addToLogFile("\n[" + dateFormat(new Date(), "dddd, mmmm dS, yyyy, h:MM:ss TT") + "] Options for request: " + JSON.stringify(options)+"; path="+path);
+    addToLogFile("\n[" + dateFormat(new Date(), "dddd, mmmm dS, yyyy, h:MM:ss TT") + "] Options for request: " + JSON.stringify(options) + "; path=" + path);
 
 
     request(options, function (error, response, body) {
@@ -55,9 +55,10 @@ var path = url_parts.path.substring(11);
             throw new Error(error);
         }
         console.log(moduleName + " Forwarded API Platform: status= " + response.statusCode);
-                        res.statusCode = response.statusCode;
-                res.setHeader('Content-Type', 'application/json');
-                res.send(response.body);
+        console.log(moduleName + "received response = " + body);
+        res.statusCode = response.statusCode;
+        res.setHeader('Content-Type', 'application/json');
+        res.send(body);
 
     });
 }
