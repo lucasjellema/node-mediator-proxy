@@ -32,7 +32,7 @@ apicsProxy.handleAPICS = function (req, res) {
     addToLogFile("\n[" + dateFormat(new Date(), "dddd, mmmm dS, yyyy, h:MM:ss TT") + "] IoTCS dropoff 1st message from IoTCS: " + JSON.stringify(iotmessage));
     var options = {
         method: 'POST',
-        url: APICS_ENDPOINT
+        url: APICS_ENDPOINT+'/'+'OfmAcedemoActsApi'
         ,
         headers:
         {
@@ -49,7 +49,7 @@ apicsProxy.handleAPICS = function (req, res) {
 
     request(options, function (error, response, body) {
         if (error) {
-            console.log(moduleName + "- Error in processing IoT Dropoff message " + JSON.stringify(error));
+            console.log(moduleName + "- Error in processing API Platform message " + JSON.stringify(error));
             throw new Error(error);
         }
         console.log(moduleName + " Forwarded API Platform: status= " + response.statusCode);

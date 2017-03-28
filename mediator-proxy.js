@@ -70,7 +70,7 @@ https.get('https://mockdataapi-lucasjellema.apaas.em2.oraclecloud.com/department
 */
 var PORT = settings.PORT;
 
-var proxyVersion = "0.9.5"
+var proxyVersion = "0.9.6"
 
 var proxyServerIP = settings.proxyServerIP;
 
@@ -166,7 +166,7 @@ app.get('/artists/*', function(req,res){ handleArtists(req, res);} );
 
 //icsDropoffProxy.registerListeners(app);
 app.post('/icsProxy/iotcs-dropoff', function(req,res){ icsDropoffProxy.handleIoT(req, res); });
-app.get('/apicsProxy', function(req,res){ apicsProxy.handleAPICS(req, res); });
+app.get('/apicsProxy/*', function(req,res){ apicsProxy.handleAPICS(req, res); });
 
 
 
