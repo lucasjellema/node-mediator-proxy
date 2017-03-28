@@ -43,8 +43,8 @@ icsDropoffProxy.handleIoT = function (req, res) {
             eventTime: iotmessage.eventTime,
             payload: {
                 data: {
-                    max_of_data_artistname: iotmessage.payload.data.max_of_data_artistname
-                    , count_of_data_artistname: iotmessage.payload.data.count_of_data_artistname
+                    max_of_data_artistname: iotmessage.payload.data.max_of_data_artistname_27
+                    , count_of_data_artistname: iotmessage.payload.data.count_of_data_artistname_5
                 }
             }
         },
