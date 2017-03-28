@@ -46,6 +46,8 @@ var path = url_parts.path.substring(11);
 
         }
     };
+    addToLogFile("\n[" + dateFormat(new Date(), "dddd, mmmm dS, yyyy, h:MM:ss TT") + "] Options for request: " + JSON.stringify(options)+"; path="+path);
+
 
     request(options, function (error, response, body) {
         if (error) {
