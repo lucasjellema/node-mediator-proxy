@@ -46,8 +46,8 @@ icsDropoffProxy.handleIoT = function (req, res) {
             eventTime: iotmessage.eventTime,
             payload: {
                 data: {
-                    max_of_data_artistname: iotmessage.payload.data.max_of_data_artistname_27
-                    , count_of_data_artistname: iotmessage.payload.data.count_of_data_artistname_5
+                              max_of_data_artistname: iotmessage.payload.data.data_artistname
+                            , count_of_data_artistname: iotmessage.payload.data.count_of_data_artistname_15
                 }
             }
         },
@@ -70,52 +70,6 @@ icsDropoffProxy.handleIoT = function (req, res) {
 
 
 }
-
-icsDropoffProxy.registerListeners =
-    function (app) {
-        console.log("*** "+moduleName + " registered at " + apiURL + "/iotcs-dropoff");
-        app.post(apiURL + '/iotcs-dropoff', function (req, res) {
-            console.log('body in request' + JSON.stringify(req.body));
-            addToLogFile("\n[" + dateFormat(new Date(), "dddd, mmmm dS, yyyy, h:MM:ss TT") + "] Handle IoTCS dropoff to ICS, forwarded to " + ICS_IOTCS_DROPOFF_ENDPOINT+" ... END OF RESOURCE URL");
-            var iotmessage = req.body;
-            addToLogFile("\n[" + dateFormat(new Date(), "dddd, mmmm dS, yyyy, h:MM:ss TT") + "] IoTCS dropoff message: " + JSON.stringify(iotmessage));
-            var options = {
-                method: 'POST',
-                url: ICS_IOTCS_DROPOFF_ENDPOINT
-                ,
-                headers:
-                {
-                    'cache-control': 'no-cache',
-                    authorization: 'Basic c3Zlbi5iZXJuaGFyZHRAb3BpdHotY29uc3VsdGluZy5jb206JHYzTjMzODFf',
-                    'content-type': 'application/json'
-                },
-                body:
-                {
-                    id: iotmessage.id,
-                    source: iotmessage.source,
-                    sentTime: iotmessage.sentTime,
-                    eventTime: iotmessage.eventTime,
-                    payload: {
-                        data: {
-                            max_of_data_artistname: iotmessage.payload.data.max_of_data_artistname
-                            , count_of_data_artistname: iotmessage.payload.data.count_of_data_artistname
-                        }
-                    }
-                },
-                json: true
-            };
-
-            request(options, function (error, response, body) {
-                if (error) {
-                    console.log("*** "+ moduleName + "- Error in processing IoT Dropoff message " + JSON.stringify(error));
-                    throw new Error(error);
-                }
-                console.log("*** "+ moduleName + " Forwarded IoT Dropoff Message to ICS: status= " + response.statusCode);
-            });
-
-
-        })
-    }//registerListeners
 
 
 function addToLogFile(logEntry) {

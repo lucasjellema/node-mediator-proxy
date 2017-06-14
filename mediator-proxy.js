@@ -164,7 +164,6 @@ app.get('/artistes/*', function(req,res){ handleArtists(req, res);} );
 app.get('/artists/*', function(req,res){ handleArtists(req, res);} );
 // what it is supposed to be app.get('/artists/*', function(req,res){ handleArtistsAPI(req, res);} );
 
-//icsDropoffProxy.registerListeners(app);
 app.post('/icsProxy/iotcs-dropoff', function(req,res){ icsDropoffProxy.handleIoT(req, res); });
 app.get('/apicsProxy/*', function(req,res){ apicsProxy.handleAPICS(req, res); });
 
