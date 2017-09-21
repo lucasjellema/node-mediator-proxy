@@ -49,8 +49,9 @@ var icsPassword = 'blOody@4PiLl';
 
  var icsTargetServer = "icsdem0058service-icsdem0058.integration.us2.oraclecloud.com";
  var pcsTargetServer = "pcs1-gse00000196.process.us2.oraclecloud.com"; // identity domain gse00000196 
- var soacsTargetServer = "140.86.4.95";
-
+ var soacsTargetServer = "129.150.91.133";
+ var artistAPITargetServer = "https://artist-api-hfwgvsrwuh.now.sh";
+ 
 
 var targetServer = "mockdataapi-lucasjellema.apaas.em2.oraclecloud.com";
 //var targetServer = "data-api-lucasjellema.apaas.em2.oraclecloud.com"
@@ -185,11 +186,10 @@ function searchKeyWithValue( obj, value ){
 /* deal with HTTP calls to ArtistAPI */
 function handleArtistsAPI(req, res) {
 
- var targetServer = "artist-enricher-api-lucasjellema.apaas.em2.oraclecloud.com";
 
  var targetPath = req.url.substring(8); // anything after /artists
  var targetPort=443;
- var targetUrl = "https://"+targetServer+":"+targetPort+targetPath;
+ var targetUrl = artistAPITargetServer+":"+targetPort+targetPath;
  console.log('forward path '+targetUrl);
  addToLogFile( "\n["+dateFormat(new Date(), "dddd, mmmm dS, yyyy, h:MM:ss TT")+"] Handle Artist Enrichment reuqest, forwarded to "+targetUrl);
 
