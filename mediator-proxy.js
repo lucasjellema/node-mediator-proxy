@@ -188,7 +188,7 @@ function handleArtistsAPI(req, res) {
 
 
  var targetPath = req.url.substring(8); // anything after /artists
- var targetUrl = artistAPITargetServer+targetPath;
+ var targetUrl = artistAPITargetServer+"/artists"+targetPath;
  console.log('forward path '+targetUrl);
  addToLogFile( "\n["+dateFormat(new Date(), "dddd, mmmm dS, yyyy, h:MM:ss TT")+"] Handle Artist Enrichment reuqest, forwarded to "+targetUrl);
 
