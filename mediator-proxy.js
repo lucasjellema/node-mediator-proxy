@@ -71,7 +71,7 @@ https.get('https://mockdataapi-lucasjellema.apaas.em2.oraclecloud.com/department
 */
 var PORT = settings.PORT;
 
-var proxyVersion = "0.9.13"
+var proxyVersion = "0.9.15"
 
 var proxyServerIP = settings.proxyServerIP;
 
@@ -162,7 +162,7 @@ app.all('/mcs/*', function(req,res){ handleMCS(req, res);} );
 app.all('/c3/*', function(req,res){ handleC3(req, res);} );
 
 app.get('/artistes/*', function(req,res){ handleArtists(req, res);} );
-app.get('/artists/*', function(req,res){ handleArtists(req, res);} );
+app.get('/artists/*', function(req,res){ handleArtistsAPI(req, res);} );
 // what it is supposed to be app.get('/artists/*', function(req,res){ handleArtistsAPI(req, res);} );
 
 app.post('/icsProxy/iotcs-dropoff', function(req,res){ icsDropoffProxy.handleIoT(req, res); });
