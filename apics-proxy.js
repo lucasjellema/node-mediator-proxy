@@ -14,7 +14,7 @@ var settings = require("./proxy-settings.js");
 var apiURL = "/apicsProxy";
 var moduleName = "accs.apicsProxy";
 
-var APICS_ENDPOINT = "http://129.144.150.67:8001";
+var APICS_ENDPOINT = "http://oc-129-144-152-17.compute.oraclecloud.com:7001";
 
 
 var apicsProxy = module.exports;
@@ -36,10 +36,12 @@ apicsProxy.handleAPICS = function (req, res) {
      qs:  url_parts.query,
   headers: 
    { 'cache-control': 'no-cache',
-     authorization: 'Basic d2VibG9naWM6MVBhYVM1cGwxdA==',
-     accept: 'application/json',
-     'tenant-id': 'OFM2017',
-     'api-key': 'd4e79807-532e-46e0-ae07-b7114228b1bc' } };
+   "accept": "application/json",
+   "content-type": "application/json",
+   "X-api-key": "ad8649cd-0829-48ec-8b71-1f0c25a0d08a",
+   "X-tenant-id": "ACEDEMO",
+   "authorization": "Basic b293YWNlZGVtbzpPT1cxN1BAJCRXMHJkQGNlREVNTw=="
+} };
 
 
 

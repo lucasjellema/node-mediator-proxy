@@ -71,7 +71,7 @@ https.get('https://mockdataapi-lucasjellema.apaas.em2.oraclecloud.com/department
 */
 var PORT = settings.PORT;
 
-var proxyVersion = "0.9.15"
+var proxyVersion = "0.9.16"
 
 var proxyServerIP = settings.proxyServerIP;
 
